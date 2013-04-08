@@ -1,0 +1,7 @@
+
+POWER SW punainen  = +5V
+         musta     = GND
+
+HDD LED  oranssi   = Analog 0
+         valkoinen = GND
+

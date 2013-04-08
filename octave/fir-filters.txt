@@ -1,0 +1,8 @@
+Simple filters and analysis:
+
+Convolution between square function and binomial coefficients:
+N=500; m=100; filter=conv(ones(1,N)/N, bincoeff(m,0:m)); filter=filter/sum(filter); [h, w] = freqz(filter, 1, 4*1024, 5000); semilogx(w, abs(h), 'o-'); axis([1 1000]);
+
+-> pretty good filtering for a 5kHz signal
+
+
