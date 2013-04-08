@@ -1,3 +1,5 @@
+ArduinoAD
+=========
 
 This program utilizes an Arduino as an analog-to-digital converter to
 sample an analog signal between 0-5 volts.  The software supports reading
@@ -15,14 +17,14 @@ does not have scripts to build the application, but rather depends on being
 run from Eclipse.
 
 
-Arduino program:
-----------------
+Arduino program
+---------------
 
 Upload the program in arduino/MultiInput/MultiInput.pde to the Arduino.
 
 
-Java software:
---------------
+Java software
+-------------
 
 You need to have RXTX library installed.  On Debian-based systems use
     sudo apt-get install librxtx-java
@@ -30,8 +32,8 @@ You need to have RXTX library installed.  On Debian-based systems use
 To start the software, run the class gui.DataAnalyzer from Eclipse.
 
 
-Usage:
-------
+Usage
+-----
 
 Click "Configure" to set up communication options.
 
@@ -45,7 +47,7 @@ comment to the beginning of the saved data file.
 
 
 By default the software uses two bytes to communicate each measured
-10-bit value, an uses the extra bits to detect missed bytes and timing
+10-bit value, and uses the extra bits to detect missed bytes and timing
 errors.
 
 If "Fast 8-bit mode" is selected, only one input is used and that is
@@ -54,11 +56,11 @@ possible.  This allows the maximum sampling frequency, but at reduced
 precision.
 
 
-Calibration:
-------------
+Calibration / scaling
+---------------------
 
-The boxes on the left side define linear scaling for the values:
-     [input value (0...1023)]  [output value]
+The boxes on the left side define linear scaling for the values:  
+     [input value (0...1023)]  [output value]  
 Clicking the "Cal" button sets the corresponding input value to the
 current input value.
 
@@ -74,8 +76,8 @@ For example, calibration of a scale using a known weight:
 
 You can use the buttons for preset calibration values:
 
-5V    Scale input values to 0...5V (analog input to Arduino)
-1:1   Set 1:1 scaling, output = input
-Tare  Subtract current output value from all output values
+    5V    Scale input values to 0...5V (analog input to Arduino)
+    1:1   Set 1:1 scaling, output = input
+    Tare  Subtract current output value from all output values
 
 
