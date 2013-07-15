@@ -1,7 +1,7 @@
 package filter;
 
-import static seriallistener.SerialDataCommunicator.INPUTS;
-import seriallistener.DataVO;
+import static arduinoad.SerialDataCommunicator.INPUTS;
+import arduinoad.DataVO;
 import util.Interpolator;
 
 public class DataInterpolationFilter extends DataFilter {

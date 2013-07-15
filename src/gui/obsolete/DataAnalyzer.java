@@ -1,6 +1,6 @@
-package gui;
+package gui.obsolete;
 
-import static seriallistener.SerialDataCommunicator.INPUTS;
+import static arduinoad.SerialDataCommunicator.INPUTS;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -41,16 +41,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import arduinoad.ArduinoConfiguration;
+import arduinoad.DataVO;
+import arduinoad.MockDataCommunicator;
+import arduinoad.SerialDataCommunicator;
+
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.adaptors.DoubleModel;
 import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.unit.GeneralUnit;
 import net.sf.openrocket.unit.UnitGroup;
 import net.sf.openrocket.util.Chars;
-import seriallistener.Configuration;
-import seriallistener.DataVO;
-import seriallistener.MockDataCommunicator;
-import seriallistener.SerialDataCommunicator;
 import util.Interpolator;
 import filter.DataAveragingFilter;
 import filter.DataInterpolationFilter;
@@ -74,8 +75,8 @@ public class DataAnalyzer extends JFrame {
 	
 	private static final int UPDATE_DELAY = 300;
 	
-	private static final Configuration DEFAULT_CONFIGURATION =
-			new Configuration(
+	private static final ArduinoConfiguration DEFAULT_CONFIGURATION =
+			new ArduinoConfiguration(
 					"/dev/ttyUSB0", // device
 					115200, // device speed
 					1000, // read delay (us)
@@ -92,7 +93,7 @@ public class DataAnalyzer extends JFrame {
 	private final DataSaveFilter saveFilter;
 	
 	
-	private Configuration configuration = null;
+	private ArduinoConfiguration configuration = null;
 	
 	private PlotDialog plotDialog = null;
 	
@@ -446,7 +447,7 @@ public class DataAnalyzer extends JFrame {
 			}
 			
 			
-			Configuration newConfig = new Configuration(serialPort, serialSpeed, delayMicros,
+			ArduinoConfiguration newConfig = new ArduinoConfiguration(serialPort, serialSpeed, delayMicros,
 					externalRef, fast, intArray, selectedInputNames.toArray(new String[0]));
 			setConfiguration(newConfig);
 			setDefaultConfiguration(newConfig);
@@ -511,7 +512,7 @@ public class DataAnalyzer extends JFrame {
 	}
 	
 	
-	private void setConfiguration(Configuration configuration) {
+	private void setConfiguration(ArduinoConfiguration configuration) {
 		closePlotDialog();
 		
 		this.configuration = configuration;
@@ -531,7 +532,7 @@ public class DataAnalyzer extends JFrame {
 	}
 	
 	
-	private void setDefaultConfiguration(Configuration configuration) {
+	private void setDefaultConfiguration(ArduinoConfiguration configuration) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -547,7 +548,7 @@ public class DataAnalyzer extends JFrame {
 		}
 	}
 	
-	private Configuration getDefaultConfiguration() {
+	private ArduinoConfiguration getDefaultConfiguration() {
 		try {
 			byte[] array = Preferences.userRoot().node("SerialDataReceiver").getByteArray("defaultConfiguration", null);
 			if (array == null) {
@@ -556,7 +557,7 @@ public class DataAnalyzer extends JFrame {
 			
 			ByteArrayInputStream bais = new ByteArrayInputStream(array);
 			ObjectInputStream ois = new ObjectInputStream(bais);
-			Configuration config = (Configuration) ois.readObject();
+			ArduinoConfiguration config = (ArduinoConfiguration) ois.readObject();
 			return config;
 		} catch (Exception e) {
 			System.err.println("Could not read stored default configuration.");

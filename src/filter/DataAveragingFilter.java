@@ -5,9 +5,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import arduinoad.DataVO;
+
 import net.sf.openrocket.util.MathUtil;
 import net.sf.openrocket.util.Pair;
-import seriallistener.DataVO;
 
 public class DataAveragingFilter extends DataFilter {
 	

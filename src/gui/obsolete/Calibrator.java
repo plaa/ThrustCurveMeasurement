@@ -1,4 +1,4 @@
-package gui;
+package gui.obsolete;
 
 public interface Calibrator {
 

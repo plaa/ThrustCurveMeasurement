@@ -9,19 +9,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import arduinoad.ArduinoConfiguration;
+import arduinoad.DataVO;
+
 import net.sf.openrocket.util.TextUtil;
-import seriallistener.Configuration;
-import seriallistener.DataVO;
 
 public class DataSaveFilter extends DataFilter {
 	
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
 	private PrintWriter stream = null;
-	private Configuration config = null;
+	private ArduinoConfiguration config = null;
 	
 	
-	public void startSave(File file, Configuration config, String comment) throws IOException {
+	public void startSave(File file, ArduinoConfiguration config, String comment) throws IOException {
 		
 		stopSave();
 		

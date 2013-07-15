@@ -1,10 +1,12 @@
-package seriallistener;
+package arduinoad;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Configuration implements Serializable {
+import configuration.Configuration;
+
+public class ArduinoConfiguration implements Serializable, Configuration {
 	
 	private final String serialDevice;
 	private final int serialSpeed;
@@ -15,7 +17,7 @@ public class Configuration implements Serializable {
 	private final String[] inputNames;
 	
 	
-	public Configuration(String serialDevice, int serialSpeed, int delay,
+	public ArduinoConfiguration(String serialDevice, int serialSpeed, int delay,
 			boolean externalReference, boolean fastMode, int[] inputNumbers,
 			String[] inputNames) {
 		

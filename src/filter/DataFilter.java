@@ -2,9 +2,10 @@ package filter;
 
 import java.util.List;
 
-import seriallistener.AbstractDataSource;
-import seriallistener.DataListener;
-import seriallistener.DataVO;
+import arduinoad.AbstractDataSource;
+import arduinoad.DataListener;
+import arduinoad.DataVO;
+
 
 public abstract class DataFilter extends AbstractDataSource implements DataListener {
 

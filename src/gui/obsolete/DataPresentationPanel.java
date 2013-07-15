@@ -1,13 +1,14 @@
-package gui;
+package gui.obsolete;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import arduinoad.ArduinoConfiguration;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.components.StyledLabel;
 import net.sf.openrocket.gui.components.StyledLabel.Style;
 import net.sf.openrocket.util.Pair;
-import seriallistener.Configuration;
 import filter.DataAveragingFilter;
 
 public class DataPresentationPanel extends JPanel {
@@ -27,7 +28,7 @@ public class DataPresentationPanel extends JPanel {
 	
 	private JLabel extraInfo;
 	
-	public DataPresentationPanel(Configuration config) {
+	public DataPresentationPanel(ArduinoConfiguration config) {
 		super(new MigLayout("fillx, gap unrel para"));
 		
 		inputs = config.getInputArray().clone();

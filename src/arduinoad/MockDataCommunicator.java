@@ -1,4 +1,4 @@
-package seriallistener;
+package arduinoad;
 
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
@@ -17,7 +17,7 @@ public class MockDataCommunicator extends SerialDataCommunicator {
 	private MockReaderThread thread;
 	
 	@Override
-	public void startListener(Configuration configuration)
+	public void startListener(ArduinoConfiguration configuration)
 			throws IOException, PortInUseException, UnsupportedCommOperationException {
 		
 		if (thread != null)

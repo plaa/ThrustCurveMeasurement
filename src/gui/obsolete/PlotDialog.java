@@ -1,4 +1,4 @@
-package gui;
+package gui.obsolete;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -29,10 +29,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import seriallistener.Configuration;
-import seriallistener.DataListener;
-import seriallistener.DataVO;
-import seriallistener.SerialDataCommunicator;
+import arduinoad.ArduinoConfiguration;
+import arduinoad.DataListener;
+import arduinoad.DataVO;
+import arduinoad.SerialDataCommunicator;
+
 
 public class PlotDialog extends JDialog implements DataListener {
 	
@@ -47,7 +48,7 @@ public class PlotDialog extends JDialog implements DataListener {
 	private long startTime = MAGIC_LONG;
 	
 	
-	public PlotDialog(Window parent, Configuration config) {
+	public PlotDialog(Window parent, ArduinoConfiguration config) {
 		super(parent, "Data plot", ModalityType.MODELESS);
 		
 		XYSeriesCollection collection = new XYSeriesCollection();
