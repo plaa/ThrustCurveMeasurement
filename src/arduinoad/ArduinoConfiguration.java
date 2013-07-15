@@ -101,4 +101,10 @@ public class ArduinoConfiguration implements Serializable, Configuration {
 		return inputNames.clone();
 	}
 	
+	@Override
+	public Configuration copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

@@ -17,4 +17,6 @@ public interface MeasurementInstance {
 	
 	public void addListener(MeasurementListener listener);
 	
+	public void removeListener(MeasurementListener listener);
+	
 }

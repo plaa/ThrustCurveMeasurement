@@ -147,4 +147,11 @@ public class ArduinoADInstance implements MeasurementInstance {
 		return 0;
 	}
 	
+	
+	@Override
+	public void removeListener(MeasurementListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

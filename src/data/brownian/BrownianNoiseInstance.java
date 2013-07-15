@@ -23,21 +23,29 @@ public class BrownianNoiseInstance implements MeasurementInstance, ActionListene
 	private double current;
 	private double min, max;
 	
+	private double dataErrorProbability;
+	private double timingMissProbability;
+	
 	private Random rnd = new Random();
 	
 	private double delay;
 	private int pointsPerGroup;
+	private double amplitude;
 	
 	public BrownianNoiseInstance(BrownianNoiseConfiguration config) {
-		int hertz = 1000;
-		pointsPerGroup = 10;
+		double hertz = config.getFrequency();
+		pointsPerGroup = config.getGrouping();
+		amplitude = config.getAmplitude();
+		
+		dataErrorProbability = config.getDataErrorProbability();
+		timingMissProbability = config.getTimingMissProbability();
 		
 		delay = 1.0 / hertz;
 		
 		timer = new Timer((int) (delay * pointsPerGroup * 1000), this);
 		current = 0;
-		min = 0;
-		max = 1024;
+		min = config.getMinimum();
+		max = config.getMaximum();
 	}
 	
 	@Override
@@ -55,21 +63,36 @@ public class BrownianNoiseInstance implements MeasurementInstance, ActionListene
 		listeners.add(listener);
 	}
 	
+	@Override
+	public void removeListener(MeasurementListener listener) {
+		listeners.remove(listener);
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		List<DataPoint> points = new ArrayList<DataPoint>(pointsPerGroup);
 		for (int i = 0; i < pointsPerGroup; i++) {
-			current += rnd.nextGaussian();
+			current += rnd.nextGaussian() * amplitude;
 			current = MathUtil.clamp(current, min, max);
 			
-			DataPoint dp = new DataPoint((long) (time * 1000), current, System.currentTimeMillis());
+			DataPoint dp = new DataPoint(time, current, System.currentTimeMillis());
 			points.add(dp);
 			time += delay;
 		}
 		
 		for (MeasurementListener l : listeners) {
 			l.processData(points);
+		}
+		
+		if (rnd.nextDouble() < timingMissProbability) {
+			for (MeasurementListener l : listeners) {
+				l.timingMiss();
+			}
+		}
+		if (rnd.nextDouble() < dataErrorProbability) {
+			for (MeasurementListener l : listeners) {
+				l.dataError();
+			}
 		}
 	}
 	
@@ -82,4 +105,5 @@ public class BrownianNoiseInstance implements MeasurementInstance, ActionListene
 	public double getMaximumValue() {
 		return max;
 	}
+	
 }

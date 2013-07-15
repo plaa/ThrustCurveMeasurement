@@ -2,7 +2,7 @@ package data;
 
 public class DataPoint {
 	
-	private long time;
+	private double time;
 	private double value;
 	private long timestamp;
 	
@@ -10,26 +10,26 @@ public class DataPoint {
 		
 	}
 	
-	public DataPoint(long time, double value, long timestamp) {
+	public DataPoint(double time, double value, long timestamp) {
 		this.time = time;
 		this.value = value;
 		this.timestamp = timestamp;
 	}
 	
 	/**
-	 * The microsecond time value for the data point.  This is the time when the
+	 * The time value for the data point in seconds.  This is the time when the
 	 * data point was measured, from the start of the measurement.
 	 * 
 	 * It may differ from the time when the point was received.
 	 */
-	public long getTime() {
+	public double getTime() {
 		return time;
 	}
 	
 	/**
-	 * Set the microsecond time value for the data point.
+	 * Set the time value for the data point in seconds.
 	 */
-	public void setTime(long time) {
+	public void setTime(double time) {
 		this.time = time;
 	}
 	

@@ -65,6 +65,9 @@ public class MainDialog extends JFrame {
 	private void startRecord(MeasurementSource source) {
 		Configurator configurator = source.getConfigurator();
 		Configuration config = configurator.configure(null);
+		if (config == null) {
+			return;
+		}
 		measurementDialog.start(source, config);
 	}
 	

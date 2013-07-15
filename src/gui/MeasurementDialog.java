@@ -1,13 +1,16 @@
 package gui;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.util.GUIUtil;
@@ -15,9 +18,7 @@ import net.sf.openrocket.gui.util.GUIUtil;
 import com.google.inject.Inject;
 
 import configuration.Configuration;
-import data.DataPoint;
 import data.MeasurementInstance;
-import data.MeasurementListener;
 import data.MeasurementSource;
 
 public class MeasurementDialog extends JDialog {
@@ -37,6 +38,13 @@ public class MeasurementDialog extends JDialog {
 		
 		this.add(panel);
 		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				measurementInstance.stop();
+				measurementInstance.removeListener(MeasurementDialog.this.graph);
+			}
+		});
 		GUIUtil.setDisposableDialogOptions(this, null);
 	}
 	
@@ -45,38 +53,21 @@ public class MeasurementDialog extends JDialog {
 		
 		measurementInstance = source.getInstance(config);
 		measurementInstance.addListener(graph);
+		graph.reset();
 		graph.setRange(measurementInstance.getMinimunValue(), measurementInstance.getMaximumValue());
+		
 		try {
 			measurementInstance.start();
 		} catch (IOException e) {
 			CharArrayWriter caw = new CharArrayWriter();
 			e.printStackTrace(new PrintWriter(caw));
-			JOptionPane.showMessageDialog(null, caw.toString(), "Error starting measurement", JOptionPane.ERROR_MESSAGE);
+			JTextArea text = new JTextArea(caw.toString());
+			text.setEditable(false);
+			JOptionPane.showMessageDialog(null, new JScrollPane(text), "Error starting measurement", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		this.setVisible(true);
 	}
 	
-	private class DataListener implements MeasurementListener {
-		
-		@Override
-		public void processData(List<DataPoint> data) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void timingMiss() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void dataError() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
 	
 }
