@@ -1,12 +1,11 @@
 package arduinoad;
 
-import net.sf.openrocket.plugin.Plugin;
 import configuration.Configuration;
 import configuration.Configurator;
 import data.MeasurementInstance;
 import data.MeasurementSource;
 
-@Plugin
+//@Plugin
 public class ArduinoADSource implements MeasurementSource {
 	
 	

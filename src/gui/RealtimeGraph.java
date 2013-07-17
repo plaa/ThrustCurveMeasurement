@@ -13,10 +13,13 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import calibration.Calibration;
 
 import com.google.inject.Inject;
 
@@ -90,34 +93,67 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		
 		this.add(chartPanel, "span, grow, wrap para");
 		
+		JLabel label;
+		String tip;
 		
-		this.add(new JLabel("Data points:"));
+		tip = "Number of data points measured so far";
+		label = new JLabel("Data points:");
+		label.setToolTipText(tip);
+		this.add(label);
 		dataCount = new JLabel();
+		dataCount.setToolTipText(tip);
 		this.add(dataCount, "gapright para");
 		
-		this.add(new JLabel("Data rate:"));
+		tip = "Data rate, as indicated by measurement source";
+		label = new JLabel("Data rate:");
+		label.setToolTipText(tip);
+		this.add(label);
 		dataRate = new JLabel();
+		dataRate.setToolTipText(tip);
 		this.add(dataRate, "gapright para");
 		
-		this.add(new JLabel("Actual rate:"));
+		tip = "<html>Actual data rate, measured based on when data points are received.<br>" +
+				"If this is lower than the data rate, it may indicate problems in data acquisition.";
+		label = new JLabel("Actual rate:");
+		label.setToolTipText(tip);
+		this.add(label);
 		actualRate = new JLabel();
+		actualRate.setToolTipText(tip);
 		this.add(actualRate, "gapright para");
 		
-		this.add(new JLabel("Timing misses:"));
+		tip = "<html>Number of times measurement has been delayed later than intended, as indicated by measurement source.<br>" +
+				"Continuous timing missings may indicate too high a sampling rate.";
+		label = new JLabel("Timing misses:");
+		label.setToolTipText(tip);
+		this.add(label);
 		timingMisses = new JLabel();
+		timingMisses.setToolTipText(tip);
 		this.add(timingMisses, "gapright para");
 		
-		this.add(new JLabel("Data errors:"));
+		tip = "Number of data errors that have been detected by the measurement source.";
+		label = new JLabel("Data errors:");
+		label.setToolTipText(tip);
+		this.add(label);
 		dataErrors = new JLabel();
+		dataErrors.setToolTipText(tip);
 		this.add(dataErrors, "gapright para");
 	}
 	
-	public void setRange(double min, double max) {
+	public void setRange(double min, double max, Calibration cal) {
 		XYPlot plot = (XYPlot) chart.getPlot();
-		NumberAxis axis = new NumberAxis("Value");
+		NumberAxis axis = new NumberAxis("Raw value");
 		axis.setAutoRange(false);
 		axis.setRange(min, max);
-		plot.setRangeAxis(axis);
+		
+		NumberAxis axis2 = new NumberAxis("Calibrated value / N");
+		axis2.setAutoRange(false);
+		min = cal.toOutput(min);
+		max = cal.toOutput(max);
+		if (max < min) {
+			max = min;
+		}
+		axis2.setRange(min, max);
+		plot.setRangeAxes(new ValueAxis[] { axis, axis2 });
 	}
 	
 	

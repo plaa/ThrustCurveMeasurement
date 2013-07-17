@@ -14,6 +14,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.SpinnerEditor;
 import net.sf.openrocket.gui.adaptors.DoubleModel;
 import net.sf.openrocket.gui.adaptors.IntegerModel;
+import net.sf.openrocket.gui.components.DescriptionArea;
 import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.gui.util.GUIUtil;
 import net.sf.openrocket.unit.UnitGroup;
@@ -53,6 +54,10 @@ public class BrownianNoiseConfigurator implements Configurator {
 		JSpinner spin;
 		
 		JPanel panel = new JPanel(new MigLayout("fill"));
+		
+		DescriptionArea desc = new DescriptionArea("This measurement source generates Brownian noise. " +
+				"It is intended for testing purposes.", 4, 0);
+		panel.add(desc, "spanx, grow, wrap para");
 		
 		model = new DoubleModel(config, "Frequency", 1);
 		panel.add(new JLabel("Frequency:"));
