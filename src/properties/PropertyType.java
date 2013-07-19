@@ -9,12 +9,24 @@ import net.sf.openrocket.plugin.Plugin;
 @Plugin
 public interface PropertyType {
 	
+	/**
+	 * Return the name of the type, e.g. "integer", "multiline string" etc.
+	 */
 	public String getName();
 	
+	/**
+	 * Return the class of the type values.
+	 */
 	public Class<?> getTypeClass();
 	
-	public PropertyVisualizer getRenderer();
+	/**
+	 * Return a PropertyRenderer for the type.
+	 */
+	public PropertyRenderer getRenderer();
 	
-	public PropertyVisualizer getEditor();
+	/**
+	 * Return a PropertyEditor for the type.
+	 */
+	public PropertyEditor getEditor();
 	
 }

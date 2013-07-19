@@ -3,13 +3,16 @@ package gui;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import properties.PropertyEditor;
 import properties.PropertyList;
+import properties.PropertyRenderer;
 import properties.PropertyValue;
-import properties.PropertyVisualizer;
 
 public class PropertyTable extends JTable {
 	private static final String[] COLUMN_NAMES = { "Name", "Value" };
@@ -23,6 +26,7 @@ public class PropertyTable extends JTable {
 		
 		this.setModel(new Model());
 		this.setDefaultRenderer(PropertyValue.class, new Renderer());
+		this.setDefaultEditor(PropertyValue.class, new Editor());
 	}
 	
 	
@@ -52,10 +56,10 @@ public class PropertyTable extends JTable {
 			return COLUMN_NAMES[columnIndex];
 		}
 		
-		//		@Override
-		//		public boolean isCellEditable(int rowIndex, int columnIndex) {
-		//			return columnIndex == 1 && editable;
-		//		}
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return columnIndex == 1 && editable;
+		}
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -66,11 +70,12 @@ public class PropertyTable extends JTable {
 			}
 		}
 		
-		//		@Override
-		//		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		//			// TODO Auto-generated method stub
-		//			
-		//		}
+		@Override
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			if (value != null) {
+				properties.setValue(rowIndex, value);
+			}
+		}
 		
 	}
 	
@@ -79,12 +84,32 @@ public class PropertyTable extends JTable {
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object objectValue, boolean isSelected, boolean hasFocus, int row, int column) {
 			PropertyValue value = (PropertyValue) objectValue;
-			PropertyVisualizer visualizer = value.getType().getRenderer();
+			PropertyRenderer renderer = value.getType().getRenderer();
 			if (isSelected) {
-				return visualizer.getComponent(value, getSelectionForeground(), getSelectionBackground());
+				return renderer.getRenderer(value, getSelectionForeground(), getSelectionBackground());
 			} else {
-				return visualizer.getComponent(value, Color.BLACK, Color.WHITE);
+				return renderer.getRenderer(value, Color.BLACK, Color.WHITE);
 			}
+		}
+		
+	}
+	
+	
+	private class Editor extends AbstractCellEditor implements TableCellEditor {
+		
+		private PropertyEditor editor;
+		
+		@Override
+		public Component getTableCellEditorComponent(JTable table, Object objectValue, boolean isSelected, int row, int column) {
+			PropertyValue value = (PropertyValue) objectValue;
+			editor = value.getType().getEditor();
+			return editor.getEditor(value);
+		}
+		
+		
+		@Override
+		public Object getCellEditorValue() {
+			return editor.getCurrentValue();
 		}
 		
 	}

@@ -10,23 +10,20 @@ import properties.PropertyRenderer;
 import properties.PropertyType;
 import properties.PropertyValue;
 
-/**
- * A single line string.
- */
 @Plugin
-public class StringProperty implements PropertyType {
+public class IntegerProperty implements PropertyType {
 	
 	private PropertyRenderer renderer = new ToStringPropertyRenderer();
 	private Editor editor = new Editor();
 	
 	@Override
 	public String getName() {
-		return "string";
+		return "integer";
 	}
 	
 	@Override
 	public Class<?> getTypeClass() {
-		return String.class;
+		return Integer.class;
 	}
 	
 	@Override
@@ -53,11 +50,13 @@ public class StringProperty implements PropertyType {
 		
 		@Override
 		public Object getCurrentValue() {
-			return field.getText();
+			try {
+				return Integer.parseInt(field.getText());
+			} catch (NumberFormatException e) {
+				return null;
+			}
 		}
 		
 	}
-	
-	
 	
 }

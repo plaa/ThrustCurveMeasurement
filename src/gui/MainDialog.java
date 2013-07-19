@@ -42,7 +42,7 @@ public class MainDialog extends JFrame {
 		sourceSelector.setEditable(false);
 		panel.add(sourceSelector);
 		
-		JButton record = new JButton("Record");
+		JButton record = new JButton("Start measurement");
 		record.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

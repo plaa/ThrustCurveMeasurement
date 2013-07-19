@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.openrocket.util.MathUtil;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -50,6 +51,8 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 	private JLabel actualRate;
 	private JLabel timingMisses;
 	private JLabel dataErrors;
+	private JLabel average;
+	private JLabel deviation;
 	
 	
 	@Inject
@@ -102,7 +105,7 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		this.add(label);
 		dataCount = new JLabel();
 		dataCount.setToolTipText(tip);
-		this.add(dataCount, "gapright para");
+		this.add(dataCount, "span, split, gapright para");
 		
 		tip = "Data rate, as indicated by measurement source";
 		label = new JLabel("Data rate:");
@@ -119,7 +122,7 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		this.add(label);
 		actualRate = new JLabel();
 		actualRate.setToolTipText(tip);
-		this.add(actualRate, "gapright para");
+		this.add(actualRate, "gapright para, wrap para");
 		
 		tip = "<html>Number of times measurement has been delayed later than intended, as indicated by measurement source.<br>" +
 				"Continuous timing missings may indicate too high a sampling rate.";
@@ -128,7 +131,7 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		this.add(label);
 		timingMisses = new JLabel();
 		timingMisses.setToolTipText(tip);
-		this.add(timingMisses, "gapright para");
+		this.add(timingMisses, "span, split, gapright para");
 		
 		tip = "Number of data errors that have been detected by the measurement source.";
 		label = new JLabel("Data errors:");
@@ -137,6 +140,23 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		dataErrors = new JLabel();
 		dataErrors.setToolTipText(tip);
 		this.add(dataErrors, "gapright para");
+		
+		tip = "Average for the plot area";
+		label = new JLabel("Avg:");
+		label.setToolTipText(tip);
+		this.add(label);
+		average = new JLabel();
+		average.setToolTipText(tip);
+		this.add(average, "gapright para");
+		
+		tip = "Standard deviation for the plot area";
+		label = new JLabel("Dev:");
+		label.setToolTipText(tip);
+		this.add(label);
+		deviation = new JLabel();
+		deviation.setToolTipText(tip);
+		this.add(deviation, "gapright para");
+		
 	}
 	
 	public void setRange(double min, double max, Calibration cal) {
@@ -172,6 +192,8 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		dataRate.setText("");
 		timingMisses.setText("");
 		dataErrors.setText("");
+		average.setText("");
+		deviation.setText("");
 	}
 	
 	
@@ -213,11 +235,25 @@ public class RealtimeGraph extends JPanel implements MeasurementListener {
 		delta = (dataPoints.getLast().getTimestamp() - dataPoints.getFirst().getTimestamp()) / 1000.0;
 		double actual = (count - 1) / delta;
 		
+		double avg = 0;
+		for (DataPoint dp : dataPoints) {
+			avg += dp.getValue();
+		}
+		avg /= count;
+		double stddev = 0;
+		for (DataPoint dp : dataPoints) {
+			stddev += MathUtil.pow2(dp.getValue() - avg);
+		}
+		stddev = Math.sqrt(stddev / count);
+		
+		
 		dataCount.setText("" + dataPointCount);
 		dataRate.setText(String.format("%.1f Hz", rate));
 		actualRate.setText(String.format("%.1f Hz", actual));
 		timingMisses.setText("" + timingMissCount);
 		dataErrors.setText("" + dataErrorCount);
+		average.setText(String.format("%.1f", avg));
+		deviation.setText(String.format("%.1f", stddev));
 	}
 	
 	private void purgeOldData(double time) {
