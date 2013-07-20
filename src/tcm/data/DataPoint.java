@@ -1,6 +1,8 @@
 package tcm.data;
 
-public class DataPoint {
+import tcm.util.Copyable;
+
+public class DataPoint implements Cloneable, Copyable<DataPoint> {
 	
 	private double time;
 	private double value;
@@ -59,6 +61,14 @@ public class DataPoint {
 		this.value = value;
 	}
 	
+	
+	public DataPoint copy() {
+		try {
+			return (DataPoint) clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	@Override
 	public String toString() {

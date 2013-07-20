@@ -2,8 +2,9 @@ package tcm.calibration;
 
 import net.sf.openrocket.util.AbstractChangeSource;
 import net.sf.openrocket.util.MathUtil;
+import tcm.util.Copyable;
 
-public class Calibration extends AbstractChangeSource {
+public class Calibration extends AbstractChangeSource implements Copyable<Calibration>, Cloneable {
 	
 	private double inputValue1 = 0;
 	private double outputValue1 = 0;
@@ -74,6 +75,15 @@ public class Calibration extends AbstractChangeSource {
 	@Override
 	public String toString() {
 		return "Calibration [" + inputValue1 + " -> " + outputValue1 + ", " + inputValue2 + " -> " + outputValue2 + "]";
+	}
+	
+	@Override
+	public Calibration copy() {
+		try {
+			return (Calibration) this.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	

@@ -28,6 +28,8 @@ import tcm.data.DataPoint;
 import tcm.data.MeasurementInstance;
 import tcm.data.MeasurementListener;
 import tcm.data.MeasurementSource;
+import tcm.document.Measurement;
+import tcm.document.MeasurementDocument;
 import tcm.properties.PropertyList;
 import tcm.properties.PropertyValue;
 import tcm.properties.types.DoubleProperty;
@@ -35,6 +37,7 @@ import tcm.properties.types.IntegerProperty;
 import tcm.properties.types.StringProperty;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 
 public class MeasurementDialog extends JDialog {
@@ -47,12 +50,17 @@ public class MeasurementDialog extends JDialog {
 	private JToggleButton record;
 	private RealtimeGraph graph;
 	private Calibration calibration = new Calibration();
+	private PropertyList properties;
 	
 	private Recorder recorder;
 	
+	private Provider<EditorFrame> editorProvider;
+	
 	@Inject
-	public MeasurementDialog(RealtimeGraph graph) {
-		super(null, "Measuring...", ModalityType.APPLICATION_MODAL);
+	public MeasurementDialog(RealtimeGraph graph, Provider<EditorFrame> editorProvider) {
+		super(null, "Measuring...", ModalityType.MODELESS);
+		
+		this.editorProvider = editorProvider;
 		
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		
@@ -62,7 +70,7 @@ public class MeasurementDialog extends JDialog {
 		
 		panel.add(new JLabel("Measurement properties:"), "wrap rel");
 		
-		PropertyList properties = new PropertyList();
+		properties = new PropertyList();
 		properties.insert("Manufacturer", new PropertyValue(new StringProperty(), "Apogee"));
 		properties.insert("Location", new PropertyValue(new StringProperty(), "Aapon mökki"));
 		properties.insert("Test number", new PropertyValue(new IntegerProperty(), 3));
@@ -76,7 +84,6 @@ public class MeasurementDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new CalibrationDialog(calibration, measurementInstance, MeasurementDialog.this).setVisible(true);
-				System.out.println("Calibration: " + calibration);
 				MeasurementDialog.this.graph.setRange(measurementInstance.getMinimunValue(), measurementInstance.getMaximumValue(), calibration);
 			}
 		});
@@ -87,7 +94,11 @@ public class MeasurementDialog extends JDialog {
 		record.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleRecord(record.isSelected());
+				if (record.isSelected()) {
+					startRecord();
+				} else {
+					stopRecord();
+				}
 			}
 		});
 		panel.add(record, "growx, wrap para");
@@ -96,8 +107,20 @@ public class MeasurementDialog extends JDialog {
 		split.setLeftComponent(panel);
 		
 		
+		panel = new JPanel(new MigLayout("fill"));
 		this.graph = graph;
-		split.setRightComponent(graph);
+		panel.add(graph, "grow, wrap");
+		
+		button = new JButton("Close");
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MeasurementDialog.this.dispose();
+			}
+		});
+		panel.add(button, "right");
+		
+		split.setRightComponent(panel);
 		
 		
 		this.add(split);
@@ -105,26 +128,11 @@ public class MeasurementDialog extends JDialog {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				measurementInstance.stop();
-				measurementInstance.removeListener(MeasurementDialog.this.graph);
+				stop();
 			}
 		});
 		GUIUtil.setDisposableDialogOptions(this, null);
 		split.setDividerLocation(0.3);
-	}
-	
-	
-	
-	private void toggleRecord(boolean selected) {
-		if (selected) {
-			recorder = new Recorder();
-			measurementInstance.addListener(recorder);
-			record.setText(RECORDING_TEXT);
-		} else {
-			measurementInstance.removeListener(recorder);
-			record.setText(RECORD_TEXT);
-			System.out.println("Recorded " + recorder.dataPoints.size() + " points");
-		}
 	}
 	
 	
@@ -146,6 +154,51 @@ public class MeasurementDialog extends JDialog {
 		}
 		
 		this.setVisible(true);
+	}
+	
+	public void stop() {
+		if (measurementInstance == null)
+			return;
+		
+		stopRecord();
+		
+		measurementInstance.removeListener(graph);
+		measurementInstance.stop();
+		measurementInstance = null;
+	}
+	
+	
+	private void startRecord() {
+		if (recorder != null) {
+			stopRecord();
+		}
+		
+		recorder = new Recorder();
+		measurementInstance.addListener(recorder);
+		record.setText(RECORDING_TEXT);
+	}
+	
+	private void stopRecord() {
+		if (recorder == null) {
+			return;
+		}
+		
+		measurementInstance.removeListener(recorder);
+		record.setText(RECORD_TEXT);
+		
+		Measurement m = new Measurement();
+		m.getDataPoints().addAll(recorder.dataPoints);
+		m.setCalibration(calibration.copy());
+		m.setPropertyList(properties.copy());
+		
+		MeasurementDocument doc = new MeasurementDocument();
+		doc.setMeasurement(m);
+		
+		EditorFrame frame = editorProvider.get();
+		frame.setDocument(doc);
+		frame.setVisible(true);
+		
+		recorder = null;
 	}
 	
 	

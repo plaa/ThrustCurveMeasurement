@@ -5,6 +5,8 @@ import net.sf.openrocket.plugin.Plugin;
 /**
  * A plugin interface that defines a specific type of property,
  * e.g. string, multiline string, integer, etc.
+ * 
+ * Instances of this class must be immutable.
  */
 @Plugin
 public interface PropertyType {

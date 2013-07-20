@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import tcm.util.Copyable;
 
 /**
  * A list of name-value property pairs.  The name functions as both the
  * user-displayed name and key for fetching the value.  When used as a key,
  * the methods are lenient, and are for example case-insensitive.
  */
-public class PropertyList {
+public class PropertyList implements Copyable<PropertyList> {
 	
 	/*
 	 * Internally:
@@ -71,8 +74,23 @@ public class PropertyList {
 	}
 	
 	
+	@Override
+	public PropertyList copy() {
+		PropertyList copy = new PropertyList();
+		
+		copy.keys.addAll(this.keys);
+		copy.names.putAll(this.names);
+		
+		for (Entry<String, PropertyValue> entry : this.values.entrySet()) {
+			copy.values.put(entry.getKey(), entry.getValue().copy());
+		}
+		
+		return copy;
+	}
+	
 	
 	private String normalize(String name) {
 		return name.toLowerCase().replaceAll("\\s+", " ").trim();
 	}
+	
 }

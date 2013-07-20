@@ -1,10 +1,12 @@
 package tcm.properties;
 
+import tcm.util.Copyable;
+
 /**
  * A class that represents a specific property value.  It contains
  * the value, and the type.
  */
-public class PropertyValue {
+public class PropertyValue implements Copyable<PropertyValue>, Cloneable {
 	
 	private final PropertyType type;
 	private Object value;
@@ -32,6 +34,19 @@ public class PropertyValue {
 	}
 	
 	
+	@Override
+	public PropertyValue copy() {
+		try {
+			PropertyValue copy = (PropertyValue) this.clone();
+			if (copy.value instanceof Copyable) {
+				copy.value = ((Copyable<?>) copy.value).copy();
+			}
+			return copy;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	
 	
 	private void check(Object v) {
@@ -40,5 +55,6 @@ public class PropertyValue {
 					(v == null ? "null" : v.getClass()));
 		}
 	}
+	
 	
 }

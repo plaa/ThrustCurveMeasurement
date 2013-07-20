@@ -11,20 +11,20 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.openrocket.util.Named;
 import tcm.configuration.Configuration;
 import tcm.configuration.Configurator;
 import tcm.data.MeasurementSource;
 
-import net.miginfocom.swing.MigLayout;
-import net.sf.openrocket.util.Named;
-
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 
 public class MainDialog extends JFrame {
 	
 	@Inject
-	private MeasurementDialog measurementDialog;
+	private Provider<MeasurementDialog> measurementDialog;
 	
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -69,7 +69,7 @@ public class MainDialog extends JFrame {
 		if (config == null) {
 			return;
 		}
-		measurementDialog.start(source, config);
+		measurementDialog.get().start(source, config);
 	}
 	
 }
