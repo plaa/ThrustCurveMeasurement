@@ -17,21 +17,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.SpinnerEditor;
 import net.sf.openrocket.gui.adaptors.DoubleModel;
+import net.sf.openrocket.gui.adaptors.IntegerModel;
 import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.gui.util.GUIUtil;
 import net.sf.openrocket.unit.FixedPrecisionUnit;
 import net.sf.openrocket.unit.UnitGroup;
 import net.sf.openrocket.util.Chars;
 import tcm.data.DataPoint;
+import tcm.defaults.Defaults;
 import tcm.document.Measurement;
 import tcm.document.MeasurementDocument;
 import tcm.file.CSVReader;
+import tcm.gui.adaptors.DoubleValue;
+import tcm.gui.adaptors.IntegerValue;
 import tcm.properties.PropertyValue;
 import tcm.properties.ProperyNames;
 import tcm.properties.types.StringProperty;
@@ -48,7 +51,7 @@ public class CSVOpenDialog extends JDialog {
 		TIME_STEP.addUnit(new FixedPrecisionUnit(Chars.MICRO + "s", 1, 0.000001));
 		TIME_STEP.addUnit(new FixedPrecisionUnit("ms", 1, 0.001));
 		TIME_STEP.addUnit(new FixedPrecisionUnit("s", 0.01));
-		TIME_STEP.setDefaultUnit(3);
+		TIME_STEP.setDefaultUnit(1);
 	}
 	
 	@Inject
@@ -57,49 +60,58 @@ public class CSVOpenDialog extends JDialog {
 	private JTextArea comments;
 	private JTable data;
 	
-	private JSpinner timeColumn;
-	private DoubleModel timeUnit;
+	private IntegerValue timeColumn;
+	private DoubleValue timeUnit;
 	private JCheckBox timeReset;
-	private JSpinner dataColumn;
+	private IntegerValue dataColumn;
 	
 	private boolean doLoad = false;
 	
-	public CSVOpenDialog() {
+	@Inject
+	public CSVOpenDialog(Defaults defaults) {
 		super(null, "Import CSV", ModalityType.APPLICATION_MODAL);
 		
 		JPanel panel = new JPanel(new MigLayout("fill"));
 		
+		JSpinner spin;
 		
 		panel.add(new JLabel("Time column:"));
-		timeColumn = new JSpinner(new SpinnerNumberModel(1, 1, 10000, 1));
-		panel.add(timeColumn);
+		timeColumn = new IntegerValue(1);
+		IntegerModel intModel = new IntegerModel(timeColumn, "Value", 1);
+		defaults.remember(intModel, "CSVOpenDialog.time_column");
+		spin = new JSpinner(intModel.getSpinnerModel());
+		panel.add(spin, "w 50lp");
 		
 		panel.add(new JLabel(" in units of "));
-		timeUnit = new DoubleModel(1, TIME_STEP, 0);
-		JSpinner spin = new JSpinner(timeUnit.getSpinnerModel());
+		timeUnit = new DoubleValue(1);
+		DoubleModel doubleModel = new DoubleModel(timeUnit, "Value", TIME_STEP, 0);
+		defaults.remember(doubleModel, "CSVOpenDialog.time_unit");
+		spin = new JSpinner(doubleModel.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		panel.add(spin, "w 100lp");
-		panel.add(new UnitSelector(timeUnit), "wrap rel");
+		panel.add(new UnitSelector(doubleModel), "wrap rel");
 		
-		timeReset = new JCheckBox("Start at zero");
+		timeReset = new JCheckBox("Start at zero time");
 		timeReset.setSelected(true);
 		panel.add(timeReset, "skip 2, spanx, wrap para");
 		
 		
 		panel.add(new JLabel("Data column:"));
-		dataColumn = new JSpinner(new SpinnerNumberModel(2, 1, 10000, 1));
-		panel.add(dataColumn, "wrap para");
+		dataColumn = new IntegerValue(2);
+		intModel = new IntegerModel(dataColumn, "Value", 1);
+		defaults.remember(intModel, "CSVOpenDialog.data_column");
+		spin = new JSpinner(intModel.getSpinnerModel());
+		panel.add(spin, "w 50lp, wrap para");
 		
 		
 		panel.add(new JLabel("Preview:"), "wrap rel");
-		
 		
 		comments = new JTextArea(10, 40);
 		comments.setEditable(false);
 		panel.add(new JScrollPane(comments), "spanx, growx, wrap rel");
 		
 		data = new JTable();
-		panel.add(new JScrollPane(data), "spanx, grow, wrap para");
+		panel.add(new JScrollPane(data), "h 150lp, spanx, grow, wrap para");
 		
 		
 		JButton ok = new JButton("OK");
