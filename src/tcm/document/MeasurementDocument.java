@@ -7,20 +7,18 @@ import java.util.List;
 import net.sf.openrocket.util.AbstractChangeSource;
 import net.sf.openrocket.util.StateChangeListener;
 import tcm.filter.DataFilter;
-import tcm.filter.filters.MovingAverageFilter;
 import tcm.util.ChangeSourceList;
+import tcm.util.Copyable;
 
-public class MeasurementDocument extends AbstractChangeSource implements StateChangeListener {
+public class MeasurementDocument extends AbstractChangeSource implements StateChangeListener, Copyable<MeasurementDocument> {
 	
 	private Measurement measurement = new Measurement();
 	
-	private final ChangeSourceList<DataFilter> filter;
+	private final ChangeSourceList<DataFilter> filters;
 	
 	public MeasurementDocument() {
-		filter = new ChangeSourceList<DataFilter>(new ArrayList<DataFilter>(), true);
-		filter.addChangeListener(this);
-		
-		filter.add(new MovingAverageFilter());
+		filters = new ChangeSourceList<DataFilter>(new ArrayList<DataFilter>(), true);
+		filters.addChangeListener(this);
 	}
 	
 	
@@ -33,11 +31,22 @@ public class MeasurementDocument extends AbstractChangeSource implements StateCh
 	}
 	
 	public List<DataFilter> getFilters() {
-		return filter;
+		return filters;
 	}
 	
 	@Override
 	public void stateChanged(EventObject o) {
 		fireChangeEvent();
+	}
+	
+	
+	@Override
+	public MeasurementDocument copy() {
+		MeasurementDocument copy = new MeasurementDocument();
+		copy.measurement = this.measurement.copy();
+		// TODO:  Filter configurations should be deep-copied
+		copy.filters.clear();
+		copy.filters.addAll(this.filters);
+		return copy;
 	}
 }

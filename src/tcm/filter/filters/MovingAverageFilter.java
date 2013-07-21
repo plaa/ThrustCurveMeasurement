@@ -23,10 +23,10 @@ import tcm.filter.AbstractDataFilter;
 @Plugin
 public class MovingAverageFilter extends AbstractDataFilter {
 	
-	private DoubleModel kernelLength = new DoubleModel(0.1, UnitGroup.UNITS_SHORT_TIME, 0);
+	private DoubleModel windowLength = new DoubleModel(0.1, UnitGroup.UNITS_SHORT_TIME, 0);
 	
 	public MovingAverageFilter() {
-		kernelLength.addChangeListener(new StateChangeListener() {
+		windowLength.addChangeListener(new StateChangeListener() {
 			@Override
 			public void stateChanged(EventObject e) {
 				fireChangeEvent();
@@ -50,7 +50,7 @@ public class MovingAverageFilter extends AbstractDataFilter {
 		int count = 0;
 		int last = 0;
 		int next = 0;
-		double delta = kernelLength.getValue() / 2;
+		double delta = windowLength.getValue() / 2;
 		
 		List<DataPoint> points = measurement.getDataPoints();
 		int n = points.size();
@@ -89,14 +89,14 @@ public class MovingAverageFilter extends AbstractDataFilter {
 		
 		panel.add(new JLabel("Length:"));
 		
-		JSpinner spin = new JSpinner(kernelLength.getSpinnerModel());
+		JSpinner spin = new JSpinner(windowLength.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		panel.add(spin, "w 60lp");
 		
-		UnitSelector unit = new UnitSelector(kernelLength);
+		UnitSelector unit = new UnitSelector(windowLength);
 		panel.add(unit);
 		
-		BasicSlider slider = new BasicSlider(kernelLength.getSliderModel(0.0, 0.25));
+		BasicSlider slider = new BasicSlider(windowLength.getSliderModel(0.0, 0.25));
 		panel.add(slider, "w 100lp");
 		
 		return panel;

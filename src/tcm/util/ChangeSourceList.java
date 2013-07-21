@@ -188,6 +188,11 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 		return list.subList(fromIndex, toIndex);
 	}
 	
+	@Override
+	public String toString() {
+		return list.toString();
+	}
+	
 	
 	
 	private void checkAdd(E e) {
