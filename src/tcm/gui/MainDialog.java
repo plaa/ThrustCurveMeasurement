@@ -2,16 +2,20 @@ package tcm.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.openrocket.gui.util.SimpleFileFilter;
 import net.sf.openrocket.util.Named;
 import tcm.configuration.Configuration;
 import tcm.configuration.Configurator;
@@ -25,6 +29,9 @@ public class MainDialog extends JFrame {
 	
 	@Inject
 	private Provider<MeasurementDialog> measurementDialog;
+	
+	@Inject
+	private Provider<CSVOpenDialog> csvOpenDialog;
 	
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -41,7 +48,7 @@ public class MainDialog extends JFrame {
 		Collections.sort(values);
 		final JComboBox sourceSelector = new JComboBox(values);
 		sourceSelector.setEditable(false);
-		panel.add(sourceSelector);
+		panel.add(sourceSelector, "growx");
 		
 		JButton record = new JButton("Start measurement");
 		record.addActionListener(new ActionListener() {
@@ -51,7 +58,18 @@ public class MainDialog extends JFrame {
 				startRecord(source);
 			}
 		});
-		panel.add(record);
+		panel.add(record, "growx, wrap para");
+		
+		
+		JButton open = new JButton("Open file");
+		open.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openFile();
+			}
+		});
+		panel.add(open, "spanx, growx, wrap para");
+		
 		
 		this.add(panel);
 		
@@ -61,7 +79,29 @@ public class MainDialog extends JFrame {
 		
 	}
 	
+	private void openFile() {
+		System.out.println("here");
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new SimpleFileFilter("Supported files", "csv"));
+		int returnVal = chooser.showOpenDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			openFile(file);
+		}
+		
+	}
 	
+	private void openFile(File file) {
+		String[] name = file.getName().split("\\.");
+		String extension = name[name.length - 1];
+		
+		if (extension.toLowerCase().equals("csv")) {
+			csvOpenDialog.get().open(file);
+		} else {
+			JOptionPane.showMessageDialog(this, "Unknown file extension: " + file.getName(), "Unknown file", JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
 	
 	private void startRecord(MeasurementSource source) {
 		Configurator configurator = source.getConfigurator();

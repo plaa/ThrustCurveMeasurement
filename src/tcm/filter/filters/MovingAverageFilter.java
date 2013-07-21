@@ -96,7 +96,7 @@ public class MovingAverageFilter extends AbstractDataFilter {
 		UnitSelector unit = new UnitSelector(kernelLength);
 		panel.add(unit);
 		
-		BasicSlider slider = new BasicSlider(kernelLength.getSliderModel(0.0, 1.0));
+		BasicSlider slider = new BasicSlider(kernelLength.getSliderModel(0.0, 0.25));
 		panel.add(slider, "w 100lp");
 		
 		return panel;

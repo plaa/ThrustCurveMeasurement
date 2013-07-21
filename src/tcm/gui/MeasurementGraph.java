@@ -6,6 +6,10 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.util.MathUtil;
@@ -32,6 +36,10 @@ public class MeasurementGraph extends JPanel {
 	
 	private JFreeChart chart;
 	
+	private JSpinner precision;
+	
+	private Measurement previousOriginal;
+	private Measurement previousFiltered;
 	
 	public MeasurementGraph() {
 		super(new MigLayout("fill"));
@@ -69,10 +77,31 @@ public class MeasurementGraph extends JPanel {
 		chartPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		this.add(chartPanel, "span, grow, wrap rel");
 		
-		this.add(new JLabel("Click+drag lower-right to zoom in, upper-left to reset zoom"));
+		this.add(new JLabel("Click+drag lower-right to zoom in, upper-left to reset zoom"), "spanx, split, gapright para");
+		
+		this.add(new JPanel(), "growx");
+		
+		String tip = "<html>Number of samples per pixel that are plotted.<br>" +
+				"1-2 is sufficient when not zooming in.<br>" +
+				"Larger values are needed if zooming.";
+		JLabel label = new JLabel("Plot precision:");
+		label.setToolTipText(tip);
+		precision = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+		precision.setToolTipText(tip);
+		this.add(label, "right");
+		this.add(precision, "right");
+		precision.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				update(previousOriginal, previousFiltered);
+			}
+		});
+		
 	}
 	
 	public void update(Measurement original, Measurement filtered) {
+		previousOriginal = original;
+		previousFiltered = filtered;
 		updateSeries(originalSeries, original.getDataPoints());
 		updateSeries(filteredSeries, filtered.getDataPoints());
 	}
@@ -86,13 +115,14 @@ public class MeasurementGraph extends JPanel {
 		
 		/*
 		 * Sample data for every pixel to be drawn, and plot minimum and maximum values.
-		 * Data is oversampled by a factor of 2.
+		 * Data is oversampled by a selectable factor.
 		 */
+		int oversample = (Integer) precision.getValue();
 		
 		DataPoint first = dataPoints.get(0);
 		DataPoint last = dataPoints.get(dataPoints.size() - 1);
 		
-		double deltaT = (last.getTime() - first.getTime()) / this.getWidth() / 2;
+		double deltaT = (last.getTime() - first.getTime()) / this.getWidth() / oversample;
 		
 		double previous = first.getTime();
 		double min = first.getValue();
