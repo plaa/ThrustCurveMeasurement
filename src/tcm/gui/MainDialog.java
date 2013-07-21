@@ -80,7 +80,6 @@ public class MainDialog extends JFrame {
 	}
 	
 	private void openFile() {
-		System.out.println("here");
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new SimpleFileFilter("Supported files", "csv"));
 		int returnVal = chooser.showOpenDialog(this);
@@ -88,7 +87,6 @@ public class MainDialog extends JFrame {
 			File file = chooser.getSelectedFile();
 			openFile(file);
 		}
-		
 	}
 	
 	private void openFile(File file) {

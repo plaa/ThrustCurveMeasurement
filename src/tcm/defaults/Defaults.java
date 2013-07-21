@@ -6,6 +6,7 @@ import java.util.prefs.Preferences;
 import net.sf.openrocket.gui.adaptors.DoubleModel;
 import net.sf.openrocket.gui.adaptors.IntegerModel;
 import net.sf.openrocket.util.StateChangeListener;
+import tcm.gui.adaptors.DoubleValue;
 
 import com.google.inject.Singleton;
 
@@ -15,6 +16,10 @@ public class Defaults {
 	public static final int INT_DEFAULT = Integer.MIN_VALUE;
 	
 	private Preferences prefs = Preferences.userRoot().node("ThrustCurveMeasurement");
+	
+	public void remember(DoubleValue value, String key) {
+		remember(new DoubleModel(value, "Value"), key);
+	}
 	
 	public void remember(final DoubleModel model, final String key) {
 		remember(model, key, true);

@@ -17,6 +17,7 @@ import net.sf.openrocket.util.MathUtil;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
@@ -104,6 +105,14 @@ public class MeasurementGraph extends JPanel {
 		previousFiltered = filtered;
 		updateSeries(originalSeries, original.getDataPoints());
 		updateSeries(filteredSeries, filtered.getDataPoints());
+		
+		XYPlot plot = (XYPlot) chart.getPlot();
+		double min = filtered.getDataPoints().get(0).getTime();
+		double max = filtered.getDataPoints().get(filtered.getDataPoints().size() - 1).getTime();
+		NumberAxis axis = new NumberAxis("Time / s");
+		axis.setAutoRange(false);
+		axis.setRange(min, max);
+		plot.setDomainAxis(axis);
 	}
 	
 	private void updateSeries(XYSeries series, List<DataPoint> dataPoints) {

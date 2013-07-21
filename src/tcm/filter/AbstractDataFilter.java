@@ -5,6 +5,9 @@ import java.awt.Component;
 import net.sf.openrocket.util.AbstractChangeSource;
 import tcm.document.Measurement;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 /**
  * Helper class for implementing data filters.
  * 
@@ -12,6 +15,10 @@ import tcm.document.Measurement;
  * The class must contain a public no-arguments constructor.
  */
 public abstract class AbstractDataFilter extends AbstractChangeSource implements DataFilterPlugin, DataFilter {
+	
+	@Inject
+	private Injector injector;
+	
 	
 	/**
 	 * Does nothing; returns the measurement as-is.  This is the case
@@ -33,15 +40,7 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	
 	@Override
 	public DataFilter getInstance() {
-		try {
-			return this.getClass().newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException("Unable to create new instance of " + this.getClass() +
-					"\nClass must have a public no-arguments constructor.", e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("Unable to create new instance of " + this.getClass() +
-					"\nClass must have a public no-arguments constructor.", e);
-		}
+		return injector.getInstance(this.getClass());
 	}
 	
 }
