@@ -19,8 +19,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.openrocket.gui.components.DescriptionArea;
 import net.sf.openrocket.gui.components.StyledLabel;
 import net.sf.openrocket.gui.components.StyledLabel.Style;
 import net.sf.openrocket.util.StateChangeListener;
@@ -36,6 +39,9 @@ public class FilterPanel extends JPanel {
 	
 	private JList filterList;
 	private Model listModel;
+	
+	private DescriptionArea description;
+	private JScrollPane configuration;
 	
 	private MeasurementDocument document = new MeasurementDocument();
 	
@@ -56,7 +62,13 @@ public class FilterPanel extends JPanel {
 		listModel = new Model();
 		document.addChangeListener(listModel);
 		filterList = new JList(listModel);
-		this.add(new JScrollPane(filterList), "spanx, grow, wrap para");
+		filterList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				updateSelection();
+			}
+		});
+		this.add(new JScrollPane(filterList), "spanx, growx, wrap para");
 		
 		
 		final JPopupMenu popup = new JPopupMenu();
@@ -65,6 +77,7 @@ public class FilterPanel extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					document.getFilters().add(plugin.getInstance());
 					filterList.setSelectedIndex(document.getFilters().size() - 1);
+					updateSelection();
 				}
 			}));
 		}
@@ -89,6 +102,7 @@ public class FilterPanel extends JPanel {
 				DataFilter f = document.getFilters().remove(index);
 				document.getFilters().add(index - 1, f);
 				filterList.setSelectedIndex(index - 1);
+				updateSelection();
 			}
 		});
 		this.add(button);
@@ -104,6 +118,7 @@ public class FilterPanel extends JPanel {
 				DataFilter f = document.getFilters().remove(index);
 				document.getFilters().add(index + 1, f);
 				filterList.setSelectedIndex(index + 1);
+				updateSelection();
 			}
 		});
 		this.add(button);
@@ -116,11 +131,22 @@ public class FilterPanel extends JPanel {
 				if (index < 0 || index > listModel.getSize() - 1) {
 					return;
 				}
-				DataFilter f = document.getFilters().remove(index);
+				document.getFilters().remove(index);
+				updateSelection();
 			}
 		});
-		this.add(button);
+		this.add(button, "wrap para");
 		
+		
+		this.add(new StyledLabel("Filter options:", Style.BOLD), "spanx, wrap rel");
+		
+		description = new DescriptionArea(3);
+		description.setOpaque(false);
+		this.add(description, "growx, wrap rel");
+		
+		configuration = new JScrollPane();
+		configuration.setOpaque(false);
+		this.add(configuration, "height 200lp, grow 1000");
 		
 		
 	}
@@ -129,6 +155,21 @@ public class FilterPanel extends JPanel {
 		this.document.removeChangeListener(listModel);
 		this.document = document;
 		this.document.addChangeListener(listModel);
+	}
+	
+	
+	
+	private void updateSelection() {
+		int index = filterList.getSelectedIndex();
+		if (index < 0 || index >= document.getFilters().size()) {
+			description.setText("");
+			configuration.setViewportView(null);
+			return;
+		}
+		
+		DataFilter filter = document.getFilters().get(index);
+		description.setText(filter.getDescription());
+		configuration.setViewportView(filter.getConfigurationComponent());
 	}
 	
 	

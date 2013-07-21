@@ -1,11 +1,14 @@
 package tcm.util;
 
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.openrocket.util.AbstractChangeSource;
+import net.sf.openrocket.util.ChangeSource;
+import net.sf.openrocket.util.StateChangeListener;
 
 /**
  * A List implementation that delegates to another list, and
@@ -18,11 +21,18 @@ import net.sf.openrocket.util.AbstractChangeSource;
 public class ChangeSourceList<E> extends AbstractChangeSource implements List<E> {
 	
 	private final List<E> list;
+	private final boolean listenToElements;
+	private final StateChangeListener listener = new StateChangeListener() {
+		@Override
+		public void stateChanged(EventObject e) {
+			fireChangeEvent();
+		}
+	};
 	
-	public ChangeSourceList(List<E> list) {
+	public ChangeSourceList(List<E> list, boolean listenToElements) {
 		this.list = list;
+		this.listenToElements = listenToElements;
 	}
-	
 	
 	@Override
 	public int size() {
@@ -57,6 +67,7 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public boolean add(E e) {
 		boolean ret = list.add(e);
+		checkAdd(e);
 		fireChangeEvent();
 		return ret;
 	}
@@ -64,6 +75,9 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public boolean remove(Object o) {
 		boolean ret = list.remove(o);
+		if (ret) {
+			checkRemove(o);
+		}
 		fireChangeEvent();
 		return ret;
 	}
@@ -76,6 +90,9 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		boolean ret = list.addAll(c);
+		for (E e : c) {
+			checkAdd(e);
+		}
 		fireChangeEvent();
 		return ret;
 	}
@@ -83,6 +100,9 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public boolean addAll(int index, Collection<? extends E> c) {
 		boolean ret = list.addAll(index, c);
+		for (E e : c) {
+			checkAdd(e);
+		}
 		fireChangeEvent();
 		return ret;
 	}
@@ -90,6 +110,9 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		boolean ret = list.removeAll(c);
+		for (Object e : c) {
+			checkRemove(e);
+		}
 		fireChangeEvent();
 		return ret;
 	}
@@ -103,6 +126,9 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	
 	@Override
 	public void clear() {
+		for (E e : list) {
+			checkRemove(e);
+		}
 		list.clear();
 		fireChangeEvent();
 	}
@@ -115,6 +141,8 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public E set(int index, E element) {
 		E ret = list.set(index, element);
+		checkRemove(ret);
+		checkAdd(element);
 		fireChangeEvent();
 		return ret;
 	}
@@ -122,12 +150,14 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 	@Override
 	public void add(int index, E element) {
 		list.add(index, element);
+		checkAdd(element);
 		fireChangeEvent();
 	}
 	
 	@Override
 	public E remove(int index) {
 		E ret = list.remove(index);
+		checkRemove(ret);
 		fireChangeEvent();
 		return ret;
 	}
@@ -158,9 +188,24 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 		return list.subList(fromIndex, toIndex);
 	}
 	
+	
+	
+	private void checkAdd(E e) {
+		if (listenToElements && (e instanceof ChangeSource)) {
+			((ChangeSource) e).addChangeListener(listener);
+		}
+	}
+	
+	private void checkRemove(Object e) {
+		if (listenToElements && (e instanceof ChangeSource)) {
+			((ChangeSource) e).removeChangeListener(listener);
+		}
+	}
+	
 	private class SubIterator implements Iterator<E> {
 		
 		private final Iterator<E> iterator;
+		private E previous;
 		
 		public SubIterator(Iterator<E> iterator) {
 			this.iterator = iterator;
@@ -173,12 +218,14 @@ public class ChangeSourceList<E> extends AbstractChangeSource implements List<E>
 		
 		@Override
 		public E next() {
-			return iterator.next();
+			previous = iterator.next();
+			return previous;
 		}
 		
 		@Override
 		public void remove() {
 			iterator.remove();
+			checkRemove(previous);
 			fireChangeEvent();
 		}
 		

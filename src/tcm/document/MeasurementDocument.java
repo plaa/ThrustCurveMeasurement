@@ -7,7 +7,7 @@ import java.util.List;
 import net.sf.openrocket.util.AbstractChangeSource;
 import net.sf.openrocket.util.StateChangeListener;
 import tcm.filter.DataFilter;
-import tcm.filter.filters.LowPassFilter;
+import tcm.filter.filters.MovingAverageFilter;
 import tcm.util.ChangeSourceList;
 
 public class MeasurementDocument extends AbstractChangeSource implements StateChangeListener {
@@ -17,10 +17,10 @@ public class MeasurementDocument extends AbstractChangeSource implements StateCh
 	private final ChangeSourceList<DataFilter> filter;
 	
 	public MeasurementDocument() {
-		filter = new ChangeSourceList<DataFilter>(new ArrayList<DataFilter>());
+		filter = new ChangeSourceList<DataFilter>(new ArrayList<DataFilter>(), true);
 		filter.addChangeListener(this);
 		
-		filter.add(new LowPassFilter());
+		filter.add(new MovingAverageFilter());
 	}
 	
 	

@@ -3,6 +3,8 @@ package tcm.gui;
 import java.awt.Color;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
@@ -64,7 +66,10 @@ public class MeasurementGraph extends JPanel {
 				true, // zoom
 				true); // tooltips
 		
-		this.add(chartPanel, "span, grow, wrap para");
+		chartPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		this.add(chartPanel, "span, grow, wrap rel");
+		
+		this.add(new JLabel("Click+drag lower-right to zoom in, upper-left to reset zoom"));
 	}
 	
 	public void update(Measurement original, Measurement filtered) {
