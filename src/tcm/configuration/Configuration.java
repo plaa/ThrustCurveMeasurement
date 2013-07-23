@@ -1,7 +1,8 @@
 package tcm.configuration;
 
-public interface Configuration {
+import tcm.util.Copyable;
+
+public interface Configuration extends Copyable<Configuration> {
 	
-	public Configuration copy();
 	
 }

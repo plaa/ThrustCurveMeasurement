@@ -8,13 +8,18 @@ import tcm.data.DataPoint;
 import tcm.properties.PropertyList;
 import tcm.util.Copyable;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * Data contained about a data measurement.
  */
 public class Measurement implements Copyable<Measurement> {
 	
+	@XStreamAlias("DataPoints")
 	private final ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
+	@XStreamAlias("PropertyList")
 	private PropertyList propertyList = new PropertyList();
+	@XStreamAlias("Calibration")
 	private Calibration calibration = new Calibration();
 	
 	

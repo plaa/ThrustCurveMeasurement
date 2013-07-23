@@ -1,6 +1,7 @@
 package tcm.filter;
 
 import java.awt.Component;
+import java.util.Map;
 
 import net.sf.openrocket.util.AbstractChangeSource;
 import tcm.document.Measurement;
@@ -29,6 +30,16 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 		return measurement;
 	}
 	
+	
+	@Override
+	public Map<String, Object> getConfiguration() {
+		return null;
+	}
+	
+	@Override
+	public void setConfiguration(Map<String, Object> config) {
+		// no-op
+	}
 	
 	/**
 	 * Returns null.  Override this method to provide a configuration component.

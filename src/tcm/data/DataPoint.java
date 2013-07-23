@@ -2,10 +2,17 @@ package tcm.data;
 
 import tcm.util.Copyable;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias("DataPoint")
 public class DataPoint implements Cloneable, Copyable<DataPoint> {
 	
+	@XStreamAsAttribute
 	private double time;
+	@XStreamAsAttribute
 	private double value;
+	@XStreamAsAttribute
 	private long timestamp;
 	
 	public DataPoint() {

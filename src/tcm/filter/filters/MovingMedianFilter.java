@@ -4,7 +4,9 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,6 +20,7 @@ import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.plugin.Plugin;
 import net.sf.openrocket.unit.UnitGroup;
 import net.sf.openrocket.util.StateChangeListener;
+import tcm.configuration.CloneableConfiguration;
 import tcm.data.DataPoint;
 import tcm.document.Measurement;
 import tcm.filter.AbstractDataFilter;
@@ -47,6 +50,13 @@ public class MovingMedianFilter extends AbstractDataFilter {
 				"A moving average filter is optimal if the noise is normally distributed, while a " +
 				"moving median filter may be better if the signal has a disproportionate amount of " +
 				"large errors.";
+	}
+	
+	@Override
+	public Map<String, Object> getConfiguration() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("length", kernelLength.getValue());
+		return map;
 	}
 	
 	@Override
@@ -117,5 +127,10 @@ public class MovingMedianFilter extends AbstractDataFilter {
 		panel.add(slider, "w 100lp");
 		
 		return panel;
+	}
+	
+	
+	public static class Config extends CloneableConfiguration {
+		public double length;
 	}
 }

@@ -68,7 +68,7 @@ public class FilterPanel extends JPanel {
 				updateSelection();
 			}
 		});
-		this.add(new JScrollPane(filterList), "spanx, growx, wrap para");
+		this.add(new JScrollPane(filterList), "spanx, growx, h 150lp, wrap para");
 		
 		
 		final JPopupMenu popup = new JPopupMenu();
@@ -155,6 +155,7 @@ public class FilterPanel extends JPanel {
 		this.document.removeChangeListener(listModel);
 		this.document = document;
 		this.document.addChangeListener(listModel);
+		listModel.stateChanged(null);
 	}
 	
 	

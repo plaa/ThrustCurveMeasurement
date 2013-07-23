@@ -1,4 +1,4 @@
-package tcm.gui;
+package tcm.file;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -32,7 +31,7 @@ import tcm.data.DataPoint;
 import tcm.defaults.Defaults;
 import tcm.document.Measurement;
 import tcm.document.MeasurementDocument;
-import tcm.file.CSVReader;
+import tcm.gui.EditorFrame;
 import tcm.gui.adaptors.DoubleValue;
 import tcm.gui.adaptors.IntegerValue;
 import tcm.properties.PropertyValue;
@@ -139,57 +138,49 @@ public class CSVOpenDialog extends JDialog {
 	}
 	
 	
-	public void open(File file) {
-		try {
-			CSVReader reader = new CSVReader();
-			Preview preview = new Preview();
-			reader.readCSV(file, preview);
-			
-			String[] columnNames = new String[preview.columns];
-			for (int i = 0; i < columnNames.length; i++) {
-				columnNames[i] = "Column " + (i + 1);
-			}
-			
-			comments.setText(preview.comment.toString());
-			comments.setCaretPosition(0);
-			
-			DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
-				}
-			};
-			String[] row = new String[preview.columns];
-			for (List<String> line : preview.data) {
-				model.addRow(line.toArray(row));
-			}
-			data.setModel(model);
-			
-			this.setVisible(true);
-			
-			if (!doLoad) {
-				return;
-			}
-			
-			Loader loader = new Loader(((Integer) timeColumn.getValue()) - 1, ((Integer) dataColumn.getValue()) - 1, timeUnit.getValue(),
-					timeReset.isSelected());
-			reader.readCSV(file, loader);
-			
-			Measurement measurement = new Measurement();
-			measurement.getPropertyList().insert(ProperyNames.COMMENT, new PropertyValue(new StringProperty(), loader.comment.toString()));
-			measurement.getDataPoints().addAll(loader.data);
-			
-			MeasurementDocument doc = new MeasurementDocument();
-			doc.setMeasurement(measurement);
-			
-			EditorFrame frame = editorFrame.get();
-			frame.setDocument(doc);
-			frame.setVisible(true);
-			
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "Error reading " + file.getName() + ": " + e.getMessage(), "Error reading file",
-					JOptionPane.ERROR_MESSAGE);
+	public MeasurementDocument open(File file) throws IOException {
+		CSVReader reader = new CSVReader();
+		Preview preview = new Preview();
+		reader.readCSV(file, preview);
+		
+		String[] columnNames = new String[preview.columns];
+		for (int i = 0; i < columnNames.length; i++) {
+			columnNames[i] = "Column " + (i + 1);
 		}
+		
+		comments.setText(preview.comment.toString());
+		comments.setCaretPosition(0);
+		
+		DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		String[] row = new String[preview.columns];
+		for (List<String> line : preview.data) {
+			model.addRow(line.toArray(row));
+		}
+		data.setModel(model);
+		
+		this.setVisible(true);
+		
+		if (!doLoad) {
+			return null;
+		}
+		
+		Loader loader = new Loader(((Integer) timeColumn.getValue()) - 1, ((Integer) dataColumn.getValue()) - 1, timeUnit.getValue(),
+				timeReset.isSelected());
+		reader.readCSV(file, loader);
+		
+		Measurement measurement = new Measurement();
+		measurement.getPropertyList().insert(ProperyNames.COMMENT, new PropertyValue(new StringProperty(), loader.comment.toString()));
+		measurement.getDataPoints().addAll(loader.data);
+		
+		MeasurementDocument doc = new MeasurementDocument();
+		doc.setMeasurement(measurement);
+		
+		return doc;
 	}
 	
 	
@@ -271,6 +262,7 @@ public class CSVOpenDialog extends JDialog {
 		@Override
 		public boolean comment(String cmt) {
 			if (data.size() == 0) {
+				cmt = cmt.trim().substring(1).trim();
 				comment.append(cmt).append('\n');
 			}
 			return true;

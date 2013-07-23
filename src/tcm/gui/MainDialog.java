@@ -3,7 +3,9 @@ package tcm.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -20,6 +22,8 @@ import net.sf.openrocket.util.Named;
 import tcm.configuration.Configuration;
 import tcm.configuration.Configurator;
 import tcm.data.MeasurementSource;
+import tcm.document.MeasurementDocument;
+import tcm.file.FileLoader;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -31,7 +35,10 @@ public class MainDialog extends JFrame {
 	private Provider<MeasurementDialog> measurementDialog;
 	
 	@Inject
-	private Provider<CSVOpenDialog> csvOpenDialog;
+	private Provider<EditorFrame> editorFrame;
+	
+	@Inject
+	private Set<FileLoader> fileLoaders;
 	
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -80,8 +87,17 @@ public class MainDialog extends JFrame {
 	}
 	
 	private void openFile() {
+		List<String> allExt = new ArrayList<String>();
+		for (FileLoader l : fileLoaders) {
+			allExt.addAll(l.getExtensions());
+		}
+		
 		JFileChooser chooser = new JFileChooser();
-		chooser.setFileFilter(new SimpleFileFilter("Supported files", "csv"));
+		chooser.setFileFilter(new SimpleFileFilter("All supported files", allExt.toArray(new String[0])));
+		for (FileLoader l : fileLoaders) {
+			chooser.addChoosableFileFilter(new SimpleFileFilter(l.getName(), l.getExtensions().toArray(new String[0])));
+		}
+		
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
@@ -93,12 +109,30 @@ public class MainDialog extends JFrame {
 		String[] name = file.getName().split("\\.");
 		String extension = name[name.length - 1];
 		
-		if (extension.toLowerCase().equals("csv")) {
-			csvOpenDialog.get().open(file);
-		} else {
+		try {
+			for (FileLoader l : fileLoaders) {
+				if (l.getExtensions().contains(extension)) {
+					MeasurementDocument doc;
+					doc = l.load(file);
+					
+					if (doc != null) {
+						EditorFrame frame = editorFrame.get();
+						frame.setDocument(doc);
+						frame.setVisible(true);
+					}
+					return;
+				}
+			}
+			
 			JOptionPane.showMessageDialog(this, "Unknown file extension: " + file.getName(), "Unknown file", JOptionPane.ERROR_MESSAGE);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, new Object[] {
+					"Error loading file " + file.getName(),
+					e.getMessage()
+			}, "Loading error", JOptionPane.ERROR_MESSAGE);
 		}
-		
 	}
 	
 	private void startRecord(MeasurementSource source) {

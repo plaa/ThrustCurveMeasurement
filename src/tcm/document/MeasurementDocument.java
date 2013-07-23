@@ -10,10 +10,15 @@ import tcm.filter.DataFilter;
 import tcm.util.ChangeSourceList;
 import tcm.util.Copyable;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("MeasurementDocument")
 public class MeasurementDocument extends AbstractChangeSource implements StateChangeListener, Copyable<MeasurementDocument> {
 	
+	@XStreamAlias("Measurement")
 	private Measurement measurement = new Measurement();
 	
+	@XStreamAlias("Filters")
 	private final ChangeSourceList<DataFilter> filters;
 	
 	public MeasurementDocument() {
