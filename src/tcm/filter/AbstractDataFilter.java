@@ -1,7 +1,6 @@
 package tcm.filter;
 
 import java.awt.Component;
-import java.util.Collections;
 import java.util.Map;
 
 import net.sf.openrocket.util.AbstractChangeSource;
@@ -38,7 +37,7 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	
 	@Override
 	public Map<String, Object> getConfiguration() {
-		return Collections.unmodifiableMap(configuration.getMap());
+		return configuration.getMap();
 	}
 	
 	@Override

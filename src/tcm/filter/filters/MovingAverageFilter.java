@@ -1,7 +1,6 @@
 package tcm.filter.filters;
 
 import java.awt.Component;
-import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -15,24 +14,12 @@ import net.sf.openrocket.gui.components.BasicSlider;
 import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.plugin.Plugin;
 import net.sf.openrocket.unit.UnitGroup;
-import net.sf.openrocket.util.StateChangeListener;
 import tcm.data.DataPoint;
 import tcm.document.Measurement;
 import tcm.filter.AbstractDataFilter;
 
 @Plugin
 public class MovingAverageFilter extends AbstractDataFilter {
-	
-	private DoubleModel windowLength = new DoubleModel(0.1, UnitGroup.UNITS_SHORT_TIME, 0);
-	
-	public MovingAverageFilter() {
-		windowLength.addChangeListener(new StateChangeListener() {
-			@Override
-			public void stateChanged(EventObject e) {
-				fireChangeEvent();
-			}
-		});
-	}
 	
 	@Override
 	public String getName() {
@@ -50,7 +37,7 @@ public class MovingAverageFilter extends AbstractDataFilter {
 		int count = 0;
 		int last = 0;
 		int next = 0;
-		double delta = windowLength.getValue() / 2;
+		double delta = getLength() / 2;
 		
 		List<DataPoint> points = measurement.getDataPoints();
 		int n = points.size();
@@ -88,17 +75,29 @@ public class MovingAverageFilter extends AbstractDataFilter {
 		JPanel panel = new JPanel(new MigLayout(""));
 		
 		panel.add(new JLabel("Length:"));
+		DoubleModel model = new DoubleModel(this, "Length", UnitGroup.UNITS_TIME_STEP, 0);
 		
-		JSpinner spin = new JSpinner(windowLength.getSpinnerModel());
+		JSpinner spin = new JSpinner(model.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		panel.add(spin, "w 60lp");
 		
-		UnitSelector unit = new UnitSelector(windowLength);
+		UnitSelector unit = new UnitSelector(model);
 		panel.add(unit);
 		
-		BasicSlider slider = new BasicSlider(windowLength.getSliderModel(0.0, 0.25));
+		BasicSlider slider = new BasicSlider(model.getSliderModel(0.0, 0.25));
 		panel.add(slider, "w 100lp");
 		
 		return panel;
 	}
+	
+	
+	public double getLength() {
+		return configuration.getDouble("length", 0.1);
+	}
+	
+	public void setLength(double length) {
+		configuration.getMap().put("length", length);
+		fireChangeEvent();
+	}
+	
 }

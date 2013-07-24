@@ -25,7 +25,7 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 	
 	
 	
-	protected int getInt(String key, int def) {
+	public int getInt(String key, int def) {
 		Object value = map.get(key);
 		if (value instanceof Number) {
 			return ((Number) value).intValue();
@@ -34,7 +34,7 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 		}
 	}
 	
-	protected double getDouble(String key, double def) {
+	public double getDouble(String key, double def) {
 		Object value = map.get(key);
 		if (value instanceof Number) {
 			return ((Number) value).doubleValue();
@@ -43,7 +43,7 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 		}
 	}
 	
-	protected boolean getBoolean(String key, boolean def) {
+	public boolean getBoolean(String key, boolean def) {
 		Object value = map.get(key);
 		if (value instanceof Boolean) {
 			return (Boolean) value;
@@ -52,7 +52,7 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 		}
 	}
 	
-	protected String getString(String key, String def) {
+	public String getString(String key, String def) {
 		Object value = map.get(key);
 		if (value instanceof String) {
 			return (String) value;

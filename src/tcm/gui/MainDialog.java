@@ -22,6 +22,7 @@ import net.sf.openrocket.util.Named;
 import tcm.configuration.Configuration;
 import tcm.configuration.Configurator;
 import tcm.data.MeasurementSource;
+import tcm.defaults.Defaults;
 import tcm.document.MeasurementDocument;
 import tcm.file.FileLoader;
 
@@ -40,11 +41,13 @@ public class MainDialog extends JFrame {
 	@Inject
 	private Set<FileLoader> fileLoaders;
 	
+	@Inject
+	private Defaults defaults;
+	
 	@SuppressWarnings("unchecked")
 	@Inject
 	public MainDialog(Set<MeasurementSource> measurementSources) {
 		super("Thrust curve measurement");
-		
 		
 		JPanel panel = new JPanel(new MigLayout("fill"));
 		
@@ -93,6 +96,7 @@ public class MainDialog extends JFrame {
 		}
 		
 		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(defaults.getFile("previousFile", null));
 		chooser.setFileFilter(new SimpleFileFilter("All supported files", allExt.toArray(new String[0])));
 		for (FileLoader l : fileLoaders) {
 			chooser.addChoosableFileFilter(new SimpleFileFilter(l.getName(), l.getExtensions().toArray(new String[0])));
@@ -101,6 +105,7 @@ public class MainDialog extends JFrame {
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
+			defaults.putFile("previousFile", file);
 			openFile(file);
 		}
 	}
@@ -118,6 +123,8 @@ public class MainDialog extends JFrame {
 					if (doc != null) {
 						EditorFrame frame = editorFrame.get();
 						frame.setDocument(doc);
+						frame.setFile(file);
+						frame.setModified(false);
 						frame.setVisible(true);
 					}
 					return;

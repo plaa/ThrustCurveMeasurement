@@ -1,7 +1,5 @@
 package tcm.filter.filters;
 
-import java.awt.Component;
-
 import net.sf.openrocket.plugin.Plugin;
 import tcm.calibration.Calibration;
 import tcm.data.DataPoint;
@@ -33,12 +31,6 @@ public class CalibrationFilter extends AbstractDataFilter {
 	@Override
 	public Measurement filterOriginalData(Measurement measurement) {
 		return filter(measurement);
-	}
-	
-	@Override
-	public Component getConfigurationComponent() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }

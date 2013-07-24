@@ -1,5 +1,6 @@
 package tcm.defaults;
 
+import java.io.File;
 import java.util.EventObject;
 import java.util.prefs.Preferences;
 
@@ -84,4 +85,18 @@ public class Defaults {
 	public void putString(String key, String value) {
 		prefs.put(key, value);
 	}
+	
+	public File getFile(String key, File def) {
+		String file = prefs.get(key, null);
+		if (file == null) {
+			return def;
+		} else {
+			return new File(file);
+		}
+	}
+	
+	public void putFile(String key, File value) {
+		prefs.put(key, value.getAbsolutePath());
+	}
+	
 }

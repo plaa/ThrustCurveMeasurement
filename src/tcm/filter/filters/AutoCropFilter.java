@@ -3,7 +3,6 @@ package tcm.filter.filters;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.EventObject;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -19,37 +18,21 @@ import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.plugin.Plugin;
 import net.sf.openrocket.unit.UnitGroup;
 import net.sf.openrocket.util.MathUtil;
-import net.sf.openrocket.util.StateChangeListener;
 import tcm.data.DataPoint;
 import tcm.defaults.Defaults;
 import tcm.document.Measurement;
 import tcm.filter.AbstractDataFilter;
-import tcm.gui.adaptors.DoubleValue;
 
 import com.google.inject.Inject;
 
 @Plugin
 public class AutoCropFilter extends AbstractDataFilter {
 	
-	private DoubleValue sampleTime = new DoubleValue(0.5);
-	private DoubleValue additionalAllowance = new DoubleValue(1);
-	private DoubleValue leaveTime = new DoubleValue(1);
-	
-	private StateChangeListener listener = new StateChangeListener() {
-		@Override
-		public void stateChanged(EventObject e) {
-			fireChangeEvent();
-		}
-	};
-	
 	@Inject
 	public AutoCropFilter(Defaults defaults) {
-		sampleTime.addChangeListener(listener);
-		additionalAllowance.addChangeListener(listener);
-		leaveTime.addChangeListener(listener);
-		defaults.remember(sampleTime, "AutoCropFilter.sample_time");
-		defaults.remember(additionalAllowance, "AutoCropFilter.additional_allowance");
-		defaults.remember(leaveTime, "AutoCropFilter.leave_time");
+		defaults.remember(new DoubleModel(this, "SampleTime"), "AutoCropFilter.sample_time");
+		defaults.remember(new DoubleModel(this, "AdditionalAllowance"), "AutoCropFilter.additional_allowance");
+		defaults.remember(new DoubleModel(this, "LeaveTime"), "AutoCropFilter.leave_time");
 	}
 	
 	
@@ -66,11 +49,14 @@ public class AutoCropFilter extends AbstractDataFilter {
 	@Override
 	public Measurement filter(Measurement measurement) {
 		List<DataPoint> points = measurement.getDataPoints();
+		double sampleTime = getSampleTime();
+		double additionalAllowance = getAdditionalAllowance();
+		double leaveTime = getLeaveTime();
 		
 		// Auto-crop start
 		double startMin = Double.POSITIVE_INFINITY;
 		double startMax = Double.NEGATIVE_INFINITY;
-		double startMeasurement = points.get(0).getTime() + sampleTime.getValue();
+		double startMeasurement = points.get(0).getTime() + sampleTime;
 		double startTimeLimit;
 		
 		ListIterator<DataPoint> iterator = points.listIterator();
@@ -90,15 +76,15 @@ public class AutoCropFilter extends AbstractDataFilter {
 			} else {
 				if (first) {
 					System.out.println("Initial startMin=" + startMin + " startMax=" + startMax);
-					startMin = startMin - (startMax - startMin) * additionalAllowance.getValue();
-					startMax = startMax + (startMax - startMin) * additionalAllowance.getValue();
+					startMin = startMin - (startMax - startMin) * additionalAllowance;
+					startMax = startMax + (startMax - startMin) * additionalAllowance;
 					System.out.println("Final startMin=" + startMin + " startMax=" + startMax);
 					first = false;
 				}
 				
 				if (p.getValue() < startMin || p.getValue() > startMax) {
 					System.out.println("Value out of bounds at " + p);
-					startTimeLimit = p.getTime() - leaveTime.getValue();
+					startTimeLimit = p.getTime() - leaveTime;
 					System.out.println("Crop before " + startTimeLimit);
 					break;
 				}
@@ -118,7 +104,7 @@ public class AutoCropFilter extends AbstractDataFilter {
 		// Auto-crop end
 		double endMin = Double.POSITIVE_INFINITY;
 		double endMax = Double.NEGATIVE_INFINITY;
-		double endMeasurement = points.get(points.size() - 1).getTime() - sampleTime.getValue();
+		double endMeasurement = points.get(points.size() - 1).getTime() - sampleTime;
 		double endTimeLimit;
 		
 		iterator = points.listIterator(points.size());
@@ -137,13 +123,13 @@ public class AutoCropFilter extends AbstractDataFilter {
 				endMax = MathUtil.max(endMax, p.getValue());
 			} else {
 				if (first) {
-					endMin = endMin - (endMax - endMin) * additionalAllowance.getValue();
-					endMax = endMax + (endMax - endMin) * additionalAllowance.getValue();
+					endMin = endMin - (endMax - endMin) * additionalAllowance;
+					endMax = endMax + (endMax - endMin) * additionalAllowance;
 					first = false;
 				}
 				
 				if (p.getValue() < endMin || p.getValue() > endMax) {
-					endTimeLimit = p.getTime() + leaveTime.getValue();
+					endTimeLimit = p.getTime() + leaveTime;
 					break;
 				}
 			}
@@ -176,7 +162,7 @@ public class AutoCropFilter extends AbstractDataFilter {
 		label.setToolTipText(tip);
 		panel.add(label);
 		
-		model = new DoubleModel(sampleTime, "Value", UnitGroup.UNITS_SHORT_TIME, 0);
+		model = new DoubleModel(this, "SampleTime", UnitGroup.UNITS_SHORT_TIME, 0);
 		spin = new JSpinner(model.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		spin.setToolTipText(tip);
@@ -193,7 +179,7 @@ public class AutoCropFilter extends AbstractDataFilter {
 		label.setToolTipText(tip);
 		panel.add(label);
 		
-		model = new DoubleModel(leaveTime, "Value", UnitGroup.UNITS_SHORT_TIME, 0);
+		model = new DoubleModel(this, "LeaveTime", UnitGroup.UNITS_SHORT_TIME, 0);
 		spin = new JSpinner(model.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		spin.setToolTipText(tip);
@@ -210,7 +196,7 @@ public class AutoCropFilter extends AbstractDataFilter {
 		label.setToolTipText(tip);
 		panel.add(label);
 		
-		model = new DoubleModel(additionalAllowance, "Value", UnitGroup.UNITS_RELATIVE, 0);
+		model = new DoubleModel(this, "AdditionalAllowance", UnitGroup.UNITS_RELATIVE, 0);
 		spin = new JSpinner(model.getSpinnerModel());
 		spin.setEditor(new SpinnerEditor(spin));
 		spin.setToolTipText(tip);
@@ -225,13 +211,41 @@ public class AutoCropFilter extends AbstractDataFilter {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				sampleTime.setValue(0.5);
-				leaveTime.setValue(1.0);
-				additionalAllowance.setValue(1.0);
+				setSampleTime(0.5);
+				setLeaveTime(1.0);
+				setAdditionalAllowance(1.0);
 			}
 		});
 		panel.add(button);
 		
 		return panel;
 	}
+	
+	public double getSampleTime() {
+		return configuration.getDouble("sampleTime", 0.5);
+	}
+	
+	public void setSampleTime(double sampleTime) {
+		configuration.getMap().put("sampleTime", sampleTime);
+		fireChangeEvent();
+	}
+	
+	public double getAdditionalAllowance() {
+		return configuration.getDouble("additionalAllowance", 0.5);
+	}
+	
+	public void setAdditionalAllowance(double allowance) {
+		configuration.getMap().put("additionalAllowance", allowance);
+		fireChangeEvent();
+	}
+	
+	public double getLeaveTime() {
+		return configuration.getDouble("leaveTime", 0.5);
+	}
+	
+	public void setLeaveTime(double leaveTime) {
+		configuration.getMap().put("leaveTime", leaveTime);
+		fireChangeEvent();
+	}
+	
 }

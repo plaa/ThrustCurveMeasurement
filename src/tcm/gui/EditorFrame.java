@@ -22,6 +22,7 @@ import javax.swing.SwingWorker;
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.util.SimpleFileFilter;
 import net.sf.openrocket.util.StateChangeListener;
+import tcm.defaults.Defaults;
 import tcm.document.Measurement;
 import tcm.document.MeasurementDocument;
 import tcm.file.FileExporter;
@@ -34,6 +35,8 @@ import com.google.inject.Inject;
 
 public class EditorFrame extends JFrame implements StateChangeListener {
 	
+	private static final String TITLE = "Measurement editor";
+	
 	private MeasurementDocument document = new MeasurementDocument();
 	
 	private MeasurementGraph graph;
@@ -42,7 +45,9 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	
 	private FilterWorker filterWorker;
 	
-	private boolean dirty = true;
+	private File file;
+	private volatile boolean modified = true;
+	private volatile boolean dirty = true;
 	
 	@Inject
 	private XMLSaver xmlSaver;
@@ -53,10 +58,13 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	@Inject
 	private Set<FileExporter> fileExporters;
 	
+	@Inject
+	private Defaults defaults;
+	
 	
 	@Inject
 	public EditorFrame(FilterPanel filterPanel) {
-		super("Measurement editor");
+		super(TITLE);
 		
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		
@@ -113,6 +121,36 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		update();
 	}
 	
+	
+	public File getFile() {
+		return file;
+	}
+	
+	public void setFile(File file) {
+		this.file = file;
+		updateTitle();
+	}
+	
+	public boolean isModified() {
+		return modified;
+	}
+	
+	public void setModified(boolean modified) {
+		this.modified = modified;
+		updateTitle();
+	}
+	
+	private void updateTitle() {
+		String title = TITLE;
+		if (file != null) {
+			title = title + " (" + file.getName() + ")";
+		}
+		if (modified) {
+			title = "*" + title;
+		}
+		setTitle(title);
+	}
+	
 	public void update() {
 		if (filterWorker != null) {
 			filterWorker.cancel(true);
@@ -135,6 +173,10 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		}
 		
 		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(defaults.getFile("previousFile", null));
+		if (file != null) {
+			chooser.setSelectedFile(file);
+		}
 		chooser.setFileFilter(new SimpleFileFilter("All supported files", allExt.toArray(new String[0])));
 		for (FileSaver l : fileSavers) {
 			chooser.addChoosableFileFilter(new SimpleFileFilter(l.getName(), l.getExtensions().toArray(new String[0])));
@@ -143,6 +185,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		int returnVal = chooser.showSaveDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
+			defaults.putFile("previousFile", file);
 			saveFile(file);
 		}
 	}
@@ -160,6 +203,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 			for (FileSaver l : fileSavers) {
 				if (l.getExtensions().contains(extension)) {
 					l.save(file, document);
+					this.setFile(file);
 					return;
 				}
 			}
@@ -185,6 +229,10 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		}
 		
 		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(defaults.getFile("previousFile", null));
+		if (file != null) {
+			chooser.setCurrentDirectory(file);
+		}
 		chooser.setFileFilter(new SimpleFileFilter("All supported files", allExt.toArray(new String[0])));
 		for (FilePlugin l : fileExporters) {
 			chooser.addChoosableFileFilter(new SimpleFileFilter(l.getName(), l.getExtensions().toArray(new String[0])));
@@ -193,6 +241,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		int returnVal = chooser.showSaveDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
+			defaults.putFile("previousFile", file);
 			exportFile(file);
 		}
 	}
@@ -236,11 +285,13 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	@Override
 	public void stateChanged(EventObject e) {
 		dirty = true;
+		modified = true;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				if (dirty) {
 					update();
+					updateTitle();
 				}
 			}
 		});
