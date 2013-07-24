@@ -75,17 +75,13 @@ public class AutoCropFilter extends AbstractDataFilter {
 				startMax = MathUtil.max(startMax, p.getValue());
 			} else {
 				if (first) {
-					System.out.println("Initial startMin=" + startMin + " startMax=" + startMax);
 					startMin = startMin - (startMax - startMin) * additionalAllowance;
 					startMax = startMax + (startMax - startMin) * additionalAllowance;
-					System.out.println("Final startMin=" + startMin + " startMax=" + startMax);
 					first = false;
 				}
 				
 				if (p.getValue() < startMin || p.getValue() > startMax) {
-					System.out.println("Value out of bounds at " + p);
 					startTimeLimit = p.getTime() - leaveTime;
-					System.out.println("Crop before " + startTimeLimit);
 					break;
 				}
 			}
