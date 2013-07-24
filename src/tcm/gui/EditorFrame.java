@@ -204,6 +204,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 				if (l.getExtensions().contains(extension)) {
 					l.save(file, document);
 					this.setFile(file);
+					this.setModified(false);
 					return;
 				}
 			}
