@@ -116,7 +116,7 @@ public class SerialDataCommunicator {
 	 * Start the serial listener.  The serial device will be opened and the starting
 	 * command bytes will be written to the device.
 	 */
-	public void startListener(ArduinoConfiguration configuration) throws IOException, PortInUseException,
+	public void startListener(ArduinoADConfiguration configuration) throws IOException, PortInUseException,
 			UnsupportedCommOperationException, NoSuchPortException {
 		
 		this.stopListener();

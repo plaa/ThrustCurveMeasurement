@@ -1,9 +1,11 @@
 package tcm.filter;
 
 import java.awt.Component;
+import java.util.Collections;
 import java.util.Map;
 
 import net.sf.openrocket.util.AbstractChangeSource;
+import tcm.configuration.AbstractConfiguration;
 import tcm.document.Measurement;
 
 import com.google.inject.Inject;
@@ -20,6 +22,7 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	@Inject
 	private Injector injector;
 	
+	protected AbstractConfiguration configuration;
 	
 	/**
 	 * Does nothing; returns the measurement as-is.  This is the case
@@ -33,12 +36,13 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	
 	@Override
 	public Map<String, Object> getConfiguration() {
-		return null;
+		return Collections.unmodifiableMap(configuration.getMap());
 	}
 	
 	@Override
 	public void setConfiguration(Map<String, Object> config) {
-		// no-op
+		configuration.updateMap(config);
+		fireChangeEvent();
 	}
 	
 	/**

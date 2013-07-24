@@ -8,7 +8,7 @@ import java.util.Map;
 import tcm.configuration.Configuration;
 
 
-public class ArduinoConfiguration implements Serializable, Configuration {
+public class ArduinoADConfiguration implements Serializable, Configuration {
 	
 	private final String serialDevice;
 	private final int serialSpeed;
@@ -19,7 +19,7 @@ public class ArduinoConfiguration implements Serializable, Configuration {
 	private final String[] inputNames;
 	
 	
-	public ArduinoConfiguration(String serialDevice, int serialSpeed, int delay,
+	public ArduinoADConfiguration(String serialDevice, int serialSpeed, int delay,
 			boolean externalReference, boolean fastMode, int[] inputNumbers,
 			String[] inputNames) {
 		
@@ -113,6 +113,12 @@ public class ArduinoConfiguration implements Serializable, Configuration {
 	public Map<String, Object> getMap() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void updateMap(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

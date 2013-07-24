@@ -17,7 +17,7 @@ public class MockDataCommunicator extends SerialDataCommunicator {
 	private MockReaderThread thread;
 	
 	@Override
-	public void startListener(ArduinoConfiguration configuration)
+	public void startListener(ArduinoADConfiguration configuration)
 			throws IOException, PortInUseException, UnsupportedCommOperationException {
 		
 		if (thread != null)

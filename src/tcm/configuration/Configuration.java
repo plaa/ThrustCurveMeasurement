@@ -17,4 +17,15 @@ public interface Configuration extends Copyable<Configuration> {
 	 */
 	public Map<String, Object> getMap();
 	
+	
+	/**
+	 * Update the configuration based on the values in the provided map.
+	 * The map may be a partial or whole configuration.  Old values may be retained
+	 * in the configuration if new values are not provided.
+	 * 
+	 * @param map	a map representing the configuration
+	 */
+	public void updateMap(Map<String, Object> map);
+	
+	
 }

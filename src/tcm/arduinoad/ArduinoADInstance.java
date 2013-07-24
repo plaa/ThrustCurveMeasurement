@@ -21,7 +21,7 @@ import tcm.data.MeasurementListener;
 
 public class ArduinoADInstance implements MeasurementInstance {
 	
-	private final ArduinoConfiguration config;
+	private final ArduinoADConfiguration config;
 	private final SerialDataCommunicator communicator;
 	
 	private final List<MeasurementListener> listeners = new ArrayList<MeasurementListener>();
@@ -29,7 +29,7 @@ public class ArduinoADInstance implements MeasurementInstance {
 	private Timer timer;
 	
 	public ArduinoADInstance(Configuration configuration) {
-		this.config = (ArduinoConfiguration) configuration;
+		this.config = (ArduinoADConfiguration) configuration;
 		this.communicator = new SerialDataCommunicator();
 		
 		this.timer = new Timer(200, new BackgroundListener());

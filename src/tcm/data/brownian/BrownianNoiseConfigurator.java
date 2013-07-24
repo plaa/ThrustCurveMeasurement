@@ -10,9 +10,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
-import tcm.configuration.Configuration;
-import tcm.configuration.Configurator;
-
 import net.miginfocom.swing.MigLayout;
 import net.sf.openrocket.gui.SpinnerEditor;
 import net.sf.openrocket.gui.adaptors.DoubleModel;
@@ -21,6 +18,8 @@ import net.sf.openrocket.gui.components.DescriptionArea;
 import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.gui.util.GUIUtil;
 import net.sf.openrocket.unit.UnitGroup;
+import tcm.configuration.Configuration;
+import tcm.configuration.Configurator;
 
 public class BrownianNoiseConfigurator implements Configurator {
 	
@@ -128,18 +127,6 @@ public class BrownianNoiseConfigurator implements Configurator {
 		GUIUtil.setDisposableDialogOptions(dialog, ok);
 		
 		return dialog;
-	}
-	
-	@Override
-	public String store(Configuration config) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public Configuration load(String stored) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }

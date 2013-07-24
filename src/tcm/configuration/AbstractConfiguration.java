@@ -18,6 +18,11 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 		return map;
 	}
 	
+	@Override
+	public void updateMap(Map<String, Object> map) {
+		this.map.putAll(map);
+	}
+	
 	
 	
 	protected int getInt(String key, int def) {
@@ -67,5 +72,7 @@ public class AbstractConfiguration extends AbstractChangeSource implements Confi
 			throw new RuntimeException(e);
 		}
 	}
+	
+	
 	
 }
