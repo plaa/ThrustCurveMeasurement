@@ -3,6 +3,7 @@ package tcm.arduinoad;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import tcm.configuration.Configuration;
 
@@ -104,6 +105,12 @@ public class ArduinoConfiguration implements Serializable, Configuration {
 	
 	@Override
 	public Configuration copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Map<String, Object> getMap() {
 		// TODO Auto-generated method stub
 		return null;
 	}

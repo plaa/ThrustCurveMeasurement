@@ -20,7 +20,6 @@ import net.sf.openrocket.gui.components.UnitSelector;
 import net.sf.openrocket.plugin.Plugin;
 import net.sf.openrocket.unit.UnitGroup;
 import net.sf.openrocket.util.StateChangeListener;
-import tcm.configuration.CloneableConfiguration;
 import tcm.data.DataPoint;
 import tcm.document.Measurement;
 import tcm.filter.AbstractDataFilter;
@@ -130,7 +129,4 @@ public class MovingMedianFilter extends AbstractDataFilter {
 	}
 	
 	
-	public static class Config extends CloneableConfiguration {
-		public double length;
-	}
 }
