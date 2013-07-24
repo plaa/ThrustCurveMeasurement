@@ -211,7 +211,9 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 				if (l.getExtensions().contains(extension)) {
 					Measurement filtered = document.getMeasurement().copy();
 					for (DataFilter filter : document.getFilters()) {
-						filtered = filter.filter(filtered);
+						if (filter.isEnabled()) {
+							filtered = filter.filter(filtered);
+						}
 					}
 					l.export(file, filtered);
 					return;
@@ -270,6 +272,8 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 			
 			for (int i = 0; i < doc.getFilters().size(); i++) {
 				DataFilter filter = doc.getFilters().get(i);
+				if (!filter.isEnabled())
+					continue;
 				
 				FilterProgress progress = new FilterProgress();
 				progress.current = i;

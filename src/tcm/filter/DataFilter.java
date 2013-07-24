@@ -22,4 +22,8 @@ public interface DataFilter extends ChangeSource {
 	
 	public Component getConfigurationComponent();
 	
+	public boolean isEnabled();
+	
+	public void setEnabled(boolean enabled);
+	
 }

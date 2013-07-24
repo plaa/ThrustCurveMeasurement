@@ -1,5 +1,8 @@
 package tcm.gui;
 
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,11 +17,16 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -34,6 +42,7 @@ import tcm.filter.DataFilterPlugin;
 import com.google.inject.Inject;
 
 public class FilterPanel extends JPanel {
+	private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 	
 	private List<DataFilterPlugin> availableFilters = new ArrayList<DataFilterPlugin>();
 	
@@ -62,10 +71,30 @@ public class FilterPanel extends JPanel {
 		listModel = new Model();
 		document.addChangeListener(listModel);
 		filterList = new JList(listModel);
+		filterList.setCellRenderer(new FilterCellRenderer());
 		filterList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				updateSelection();
+			}
+		});
+		filterList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Point p = e.getPoint();
+				int index = filterList.locationToIndex(p);
+				if (index < 0)
+					return;
+				
+				Rectangle rect = filterList.getCellBounds(index, index);
+				if (p.x > rect.height)
+					return;
+				
+				if (index >= 0 && index < document.getFilters().size()) {
+					DataFilter filter = document.getFilters().get(index);
+					filter.setEnabled(!filter.isEnabled());
+					filterList.repaint();
+				}
 			}
 		});
 		this.add(new JScrollPane(filterList), "spanx, growx, h 150lp, wrap para");
@@ -177,7 +206,7 @@ public class FilterPanel extends JPanel {
 	private class Model extends AbstractListModel implements StateChangeListener {
 		@Override
 		public Object getElementAt(int index) {
-			return document.getFilters().get(index).getName();
+			return document.getFilters().get(index);
 		}
 		
 		@Override
@@ -188,6 +217,26 @@ public class FilterPanel extends JPanel {
 		@Override
 		public void stateChanged(EventObject arg0) {
 			fireContentsChanged(this, 0, getSize());
+		}
+	}
+	
+	// Based on http://www.devx.com/tips/Tip/5342
+	protected class FilterCellRenderer implements ListCellRenderer {
+		private final JCheckBox checkbox = new JCheckBox();
+		
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			DataFilter filter = (DataFilter) value;
+			checkbox.setText(filter.getName());
+			checkbox.setSelected(filter.isEnabled());
+			checkbox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+			checkbox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+			checkbox.setOpaque(true);
+			checkbox.setEnabled(list.isEnabled());
+			checkbox.setFont(list.getFont());
+			checkbox.setFocusPainted(false);
+			checkbox.setBorderPainted(true);
+			checkbox.setBorder(isSelected ? UIManager.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
+			return checkbox;
 		}
 	}
 	

@@ -24,6 +24,8 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	
 	protected AbstractConfiguration configuration = new AbstractConfiguration();
 	
+	private boolean enabled = true;
+	
 	/**
 	 * Does nothing; returns the measurement as-is.  This is the case
 	 * for most data filters.
@@ -46,6 +48,20 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 			fireChangeEvent();
 		}
 	}
+	
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	
+	public void setEnabled(boolean enabled) {
+		if (this.enabled == enabled)
+			return;
+		this.enabled = enabled;
+		fireChangeEvent();
+	}
+	
 	
 	/**
 	 * Returns null.  Override this method to provide a configuration component.

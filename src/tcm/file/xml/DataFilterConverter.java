@@ -27,8 +27,13 @@ public class DataFilterConverter implements Converter {
 	
 	@Override
 	public void marshal(Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
-		Map<String, Object> config = ((DataFilter) obj).getConfiguration();
-		if (config != null) {
+		DataFilter filter = (DataFilter) obj;
+		writer.startNode("enabled");
+		context.convertAnother(filter.isEnabled());
+		writer.endNode();
+		
+		Map<String, Object> config = filter.getConfiguration();
+		if (config != null && !config.isEmpty()) {
 			writer.startNode("Configuration");
 			context.convertAnother(config);
 			writer.endNode();
@@ -50,7 +55,12 @@ public class DataFilterConverter implements Converter {
 		Map<String, Object> config = new HashMap<String, Object>();
 		while (reader.hasMoreChildren()) {
 			reader.moveDown();
-			if (reader.getNodeName().equals("Configuration")) {
+			if (reader.getNodeName().equals("enabled")) {
+				Boolean b = (Boolean) context.convertAnother(config, Boolean.class);
+				if (b != null) {
+					filter.setEnabled(b);
+				}
+			} else if (reader.getNodeName().equals("Configuration")) {
 				config = (Map<String, Object>) context.convertAnother(config, HashMap.class);
 				filter.setConfiguration(config);
 			}
