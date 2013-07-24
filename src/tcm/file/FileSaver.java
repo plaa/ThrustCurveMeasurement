@@ -2,23 +2,12 @@ package tcm.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import net.sf.openrocket.plugin.Plugin;
 import tcm.document.MeasurementDocument;
 
 @Plugin
-public interface FileSaver {
-	
-	/**
-	 * Return the name of the file type this plugin loads.
-	 */
-	public String getName();
-	
-	/**
-	 * Return the file extensions this plugin supports (without dots).
-	 */
-	public List<String> getExtensions();
+public interface FileSaver extends FilePlugin {
 	
 	/**
 	 * Save to the specified file.  Overwrite if the file exists.

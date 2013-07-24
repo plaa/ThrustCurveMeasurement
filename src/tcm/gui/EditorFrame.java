@@ -24,6 +24,8 @@ import net.sf.openrocket.gui.util.SimpleFileFilter;
 import net.sf.openrocket.util.StateChangeListener;
 import tcm.document.Measurement;
 import tcm.document.MeasurementDocument;
+import tcm.file.FileExporter;
+import tcm.file.FilePlugin;
 import tcm.file.FileSaver;
 import tcm.file.XMLSaver;
 import tcm.filter.DataFilter;
@@ -47,6 +49,9 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	
 	@Inject
 	private Set<FileSaver> fileSavers;
+	
+	@Inject
+	private Set<FileExporter> fileExporters;
 	
 	
 	@Inject
@@ -72,14 +77,24 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		panel.add(filterProgressBar, "span, growx, wrap para");
 		
 		
-		JButton save = new JButton("Save / Export");
+		JButton save = new JButton("Save");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveFile();
 			}
 		});
-		panel.add(save);
+		panel.add(save, "spanx, split");
+		
+		
+		JButton export = new JButton("Export");
+		export.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportFile();
+			}
+		});
+		panel.add(export);
 		
 		
 		split.setRightComponent(panel);
@@ -157,6 +172,59 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 					"Error saving file " + file.getName(),
 					e.getMessage()
 			}, "Saving error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	
+	
+	
+	private void exportFile() {
+		List<String> allExt = new ArrayList<String>();
+		for (FilePlugin l : fileExporters) {
+			allExt.addAll(l.getExtensions());
+		}
+		
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new SimpleFileFilter("All supported files", allExt.toArray(new String[0])));
+		for (FilePlugin l : fileExporters) {
+			chooser.addChoosableFileFilter(new SimpleFileFilter(l.getName(), l.getExtensions().toArray(new String[0])));
+		}
+		
+		int returnVal = chooser.showSaveDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			exportFile(file);
+		}
+	}
+	
+	private void exportFile(File file) {
+		String[] name = file.getName().split("\\.");
+		String extension = name[name.length - 1];
+		
+		if (name.length == 1) {
+			file = new File(file.getAbsolutePath() + ".tcm");
+			extension = "tcm";
+		}
+		
+		try {
+			for (FileExporter l : fileExporters) {
+				if (l.getExtensions().contains(extension)) {
+					Measurement filtered = document.getMeasurement().copy();
+					for (DataFilter filter : document.getFilters()) {
+						filtered = filter.filter(filtered);
+					}
+					l.export(file, filtered);
+					return;
+				}
+			}
+			
+			JOptionPane.showMessageDialog(this, "Unknown file extension: " + file.getName(), "Unknown file", JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, new Object[] {
+					"Error exporting file " + file.getName(),
+					e.getMessage()
+			}, "Export error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

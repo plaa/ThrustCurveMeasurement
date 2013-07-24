@@ -13,8 +13,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class Defaults {
 	
-	public static final int INT_DEFAULT = Integer.MIN_VALUE;
-	
 	private Preferences prefs = Preferences.userRoot().node("ThrustCurveMeasurement");
 	
 	public void remember(DoubleValue value, String key) {
@@ -27,7 +25,7 @@ public class Defaults {
 	
 	public void remember(final DoubleModel model, final String key, boolean recall) {
 		if (recall) {
-			double value = getDouble(key);
+			double value = getDouble(key, Double.NaN);
 			if (!Double.isNaN(value)) {
 				model.setValue(value);
 			}
@@ -48,8 +46,8 @@ public class Defaults {
 	
 	public void remember(final IntegerModel model, final String key, boolean recall) {
 		if (recall) {
-			int value = getInt(key);
-			if (value != INT_DEFAULT) {
+			int value = getInt(key, Integer.MIN_VALUE);
+			if (value != Integer.MIN_VALUE) {
 				model.setValue(value);
 			}
 		}
@@ -63,20 +61,27 @@ public class Defaults {
 	}
 	
 	
-	public double getDouble(String key) {
-		return prefs.getDouble(key, Double.NaN);
+	public double getDouble(String key, double def) {
+		return prefs.getDouble(key, def);
 	}
 	
 	public void putDouble(String key, double value) {
 		prefs.putDouble(key, value);
 	}
 	
-	public int getInt(String key) {
-		return prefs.getInt(key, INT_DEFAULT);
+	public int getInt(String key, int def) {
+		return prefs.getInt(key, def);
 	}
 	
 	public void putInt(String key, int value) {
 		prefs.putInt(key, value);
 	}
 	
+	public String getString(String key, String def) {
+		return prefs.get(key, def);
+	}
+	
+	public void putString(String key, String value) {
+		prefs.put(key, value);
+	}
 }

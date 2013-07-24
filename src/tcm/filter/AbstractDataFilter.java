@@ -22,7 +22,7 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	@Inject
 	private Injector injector;
 	
-	protected AbstractConfiguration configuration;
+	protected AbstractConfiguration configuration = new AbstractConfiguration();
 	
 	/**
 	 * Does nothing; returns the measurement as-is.  This is the case
@@ -41,8 +41,10 @@ public abstract class AbstractDataFilter extends AbstractChangeSource implements
 	
 	@Override
 	public void setConfiguration(Map<String, Object> config) {
-		configuration.updateMap(config);
-		fireChangeEvent();
+		if (config != null) {
+			configuration.updateMap(config);
+			fireChangeEvent();
+		}
 	}
 	
 	/**
