@@ -2,6 +2,8 @@ package tcm.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +83,24 @@ public class MainDialog extends JFrame {
 		panel.add(open, "spanx, growx, wrap para");
 		
 		
+		JButton quit = new JButton("Quit");
+		quit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				quit();
+			}
+		});
+		panel.add(quit, "spanx, growx, wrap para");
+		
 		this.add(panel);
+		
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				quit();
+			}
+		});
 		
 		this.pack();
 		this.validate();
@@ -139,6 +158,14 @@ public class MainDialog extends JFrame {
 					"Error loading file " + file.getName(),
 					e.getMessage()
 			}, "Loading error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void quit() {
+		int value = JOptionPane.showConfirmDialog(MainDialog.this, "Are you sure you want to quit?", "Quit?",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (value == JOptionPane.OK_OPTION) {
+			System.exit(0);
 		}
 	}
 	
