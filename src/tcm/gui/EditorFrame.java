@@ -230,7 +230,8 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, new Object[] {
 					"Error saving file " + file.getName(),
-					e.getMessage()
+					e.getMessage(),
+					"Original file (if any) was renamed to " + file.getName() + ".bak"
 			}, "Saving error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -281,6 +282,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 					"A bug occurred while saving the file.",
 					"The file could be saved, but there is a problem when loading the file.",
 					"Please export the data to ensure you don't lose the data.",
+					"The original file (if any) was renamed to " + file.getName() + ".bak",
 					"Error:",
 					e.getMessage()
 			}, "Bug saving file", JOptionPane.ERROR_MESSAGE);
