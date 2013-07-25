@@ -1,5 +1,6 @@
 package tcm.data;
 
+import net.sf.openrocket.util.MathUtil;
 import tcm.util.Copyable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -80,6 +81,34 @@ public class DataPoint implements Cloneable, Copyable<DataPoint> {
 	@Override
 	public String toString() {
 		return "DataPoint [time=" + time + ", value=" + value + ", timestamp=" + timestamp + "]";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataPoint other = (DataPoint) obj;
+		if (!MathUtil.equals(this.time, other.time))
+			return false;
+		if (timestamp != other.timestamp)
+			return false;
+		if (!MathUtil.equals(this.value, other.value))
+			return false;
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((int) (time * 1000));
+		result = prime * result + ((int) (timestamp));
+		result = prime * result + ((int) (value * 1000));
+		return result;
 	}
 	
 }

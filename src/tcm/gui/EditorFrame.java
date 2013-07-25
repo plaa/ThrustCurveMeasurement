@@ -3,6 +3,7 @@ package tcm.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
@@ -26,9 +27,10 @@ import tcm.defaults.Defaults;
 import tcm.document.Measurement;
 import tcm.document.MeasurementDocument;
 import tcm.file.FileExporter;
+import tcm.file.FileLoader;
 import tcm.file.FilePlugin;
 import tcm.file.FileSaver;
-import tcm.file.XMLSaver;
+import tcm.file.XMLLoaderSaver;
 import tcm.filter.DataFilter;
 
 import com.google.inject.Inject;
@@ -50,7 +52,7 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	private volatile boolean dirty = true;
 	
 	@Inject
-	private XMLSaver xmlSaver;
+	private XMLLoaderSaver xmlSaver;
 	
 	@Inject
 	private Set<FileSaver> fileSavers;
@@ -202,7 +204,20 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 		try {
 			for (FileSaver l : fileSavers) {
 				if (l.getExtensions().contains(extension)) {
+					
+					// Create backup file
+					if (file.exists()) {
+						File backup = new File(file.getAbsolutePath() + ".bak");
+						if (backup.exists()) {
+							backup.delete();
+						}
+						file.renameTo(backup);
+					}
+					
 					l.save(file, document);
+					
+					testFile(file, document, l);
+					
 					this.setFile(file);
 					this.setModified(false);
 					return;
@@ -222,6 +237,59 @@ public class EditorFrame extends JFrame implements StateChangeListener {
 	
 	
 	
+	
+	private void testFile(File file, MeasurementDocument expect, FilePlugin plugin) {
+		if (!(plugin instanceof FileLoader))
+			return;
+		
+		// Test that the file is OK to load
+		try {
+			String errors = "";
+			
+			MeasurementDocument doc = ((FileLoader) plugin).load(file);
+			if (!doc.getMeasurement().getDataPoints().equals(expect.getMeasurement().getDataPoints())) {
+				errors += "The data points in the saved file differ from the original\n";
+			}
+			
+			if (doc.getFilters().size() != expect.getFilters().size()) {
+				errors += "The data filters in the saved file differ from the original\n";
+			} else {
+				for (int i = 0; i < doc.getFilters().size(); i++) {
+					DataFilter f1 = doc.getFilters().get(i);
+					DataFilter f2 = expect.getFilters().get(i);
+					if (f1.getClass() != f2.getClass() || !f1.getConfiguration().equals(f2.getConfiguration())) {
+						errors += "The data filters in the saved file differ from the original\n";
+						break;
+					}
+				}
+			}
+			
+			if (doc.getMeasurement().getPropertyList().equals(expect.getMeasurement().getPropertyList())) {
+				errors += "The measurement properties in the saved file differ from the original\n";
+			}
+			
+			if (!doc.getMeasurement().getCalibration().equals(expect.getMeasurement().getCalibration())) {
+				errors += "The calibration in the saved file differ from the original\n";
+			}
+			
+			if (errors.length() > 0) {
+				throw new IOException(errors);
+			}
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, new String[] {
+					"A bug occurred while saving the file.",
+					"The file could be saved, but there is a problem when loading the file.",
+					"Please export the data to ensure you don't lose the data.",
+					"Error:",
+					e.getMessage()
+			}, "Bug saving file", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		// TODO Auto-generated method stub
+		
+	}
 	
 	private void exportFile() {
 		List<String> allExt = new ArrayList<String>();

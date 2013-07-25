@@ -86,5 +86,36 @@ public class Calibration extends AbstractChangeSource implements Copyable<Calibr
 		}
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Calibration other = (Calibration) obj;
+		if (!MathUtil.equals(this.inputValue1, other.inputValue1))
+			return false;
+		if (!MathUtil.equals(this.inputValue2, other.inputValue2))
+			return false;
+		if (!MathUtil.equals(this.outputValue1, other.outputValue1))
+			return false;
+		if (!MathUtil.equals(this.outputValue2, other.outputValue2))
+			return false;
+		return true;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((int) (inputValue1 * 1000));
+		result = prime * result + ((int) (inputValue2 * 1000));
+		result = prime * result + ((int) (outputValue1 * 1000));
+		result = prime * result + ((int) (outputValue2 * 1000));
+		return result;
+	}
 	
 }
