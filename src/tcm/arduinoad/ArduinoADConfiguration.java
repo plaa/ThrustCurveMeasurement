@@ -1,124 +1,58 @@
 package tcm.arduinoad;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import tcm.configuration.Configuration;
+import tcm.configuration.AbstractConfiguration;
 
 
-public class ArduinoADConfiguration implements Serializable, Configuration {
+public class ArduinoADConfiguration extends AbstractConfiguration {
 	
-	private final String serialDevice;
-	private final int serialSpeed;
-	private final int delay;
-	private final boolean externalReference;
-	private final boolean fastMode;
-	private final int[] inputs;
-	private final String[] inputNames;
-	
-	
-	public ArduinoADConfiguration(String serialDevice, int serialSpeed, int delay,
-			boolean externalReference, boolean fastMode, int[] inputNumbers,
-			String[] inputNames) {
-		
-		if (inputNumbers.length < 1) {
-			throw new IllegalArgumentException("At least one input needs to be defined");
-		}
-		if (inputNumbers.length != inputNames.length) {
-			throw new IllegalArgumentException("inputs and names have different length");
-		}
-		
-		this.serialDevice = serialDevice;
-		this.serialSpeed = serialSpeed;
-		this.delay = delay;
-		this.inputs = inputNumbers.clone();
-		this.inputNames = inputNames.clone();
-		
-		// sort
-		boolean modified;
-		do {
-			modified = false;
-			for (int i = 0; i < inputs.length - 1; i++) {
-				if (inputs[i] > inputs[i + 1]) {
-					int tmp = inputs[i + 1];
-					inputs[i + 1] = inputs[i];
-					inputs[i] = tmp;
-					
-					String str = inputNames[i + 1];
-					inputNames[i + 1] = inputNames[i];
-					inputNames[i] = str;
-					modified = true;
-					break;
-				}
-			}
-		} while (modified);
-		
-		this.externalReference = externalReference;
-		this.fastMode = fastMode;
-	}
 	
 	public String getSerialDevice() {
-		return serialDevice;
+		return getString("serialDevice", "");
+	}
+	
+	public void setSerialDevice(String serialDevice) {
+		map.put("serialDevice", serialDevice);
+		fireChangeEvent();
 	}
 	
 	public int getSerialSpeed() {
-		return serialSpeed;
+		return getInt("serialSpeed", 115200);
+	}
+	
+	public void setSerialSpeed(int serialSpeed) {
+		map.put("serialSpeed", serialSpeed);
+		fireChangeEvent();
 	}
 	
 	public int getDelay() {
-		return delay;
+		return getInt("delay", 1000);
 	}
 	
-	public boolean getExternalReference() {
-		return externalReference;
+	public void setDelay(int delay) {
+		map.put("delay", delay);
+		fireChangeEvent();
 	}
 	
-	public boolean getFastMode() {
-		return fastMode;
+	public boolean isExternalReference() {
+		return getBoolean("externalReference", false);
 	}
 	
-	public List<Integer> getInputs() {
-		List<Integer> list = new ArrayList<Integer>();
-		for (int i : inputs) {
-			list.add(i);
-		}
-		return list;
+	public void setExternalReference(boolean externalReference) {
+		map.put("externalReference", externalReference);
+		fireChangeEvent();
 	}
 	
-	public int[] getInputArray() {
-		return inputs.clone();
+	public int getInput() {
+		return getInt("input", 0);
 	}
 	
-	public List<String> getInputNames() {
-		List<String> list = new ArrayList<String>();
-		for (String s : inputNames) {
-			list.add(s);
-		}
-		return list;
+	public void setInput(int input) {
+		map.put("input", input);
+		fireChangeEvent();
 	}
 	
-	public String[] getInputNamesArray() {
-		return inputNames.clone();
-	}
-	
-	@Override
-	public Configuration copy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public Map<String, Object> getMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void updateMap(Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		
+	public boolean isFastMode() {
+		return false;
 	}
 	
 }

@@ -123,11 +123,13 @@ public class SerialDataCommunicator {
 		queue.clear();
 		
 		String name = configuration.getSerialDevice();
-		boolean externalReference = configuration.getExternalReference();
-		boolean fastMode = configuration.getFastMode();
+		boolean externalReference = configuration.isExternalReference();
+		boolean fastMode = configuration.isFastMode();
 		int delay = configuration.getDelay();
 		int baudrate = configuration.getSerialSpeed();
-		int[] inputNumbers = configuration.getInputArray();
+		int[] inputNumbers = new int[] { configuration.getInput() };
+		
+		System.out.println("Device=" + name + " rate=" + baudrate + " delay=" + delay + " inputs=" + Arrays.toString(inputNumbers) + " ext=" + externalReference + " fast=" + fastMode);
 		
 		if (baudrate % 100 != 0) {
 			throw new IllegalArgumentException("baud rate not multiple of 100");
@@ -135,7 +137,7 @@ public class SerialDataCommunicator {
 		
 		
 		int inputBits = 0;
-		for (int i : configuration.getInputArray()) {
+		for (int i : inputNumbers) {
 			if (i < 0 || i > INPUTS) {
 				throw new IllegalArgumentException("illegal input number " + i + " specified");
 			}
@@ -155,7 +157,7 @@ public class SerialDataCommunicator {
 			this.fastModeInput = inputNumbers[0];
 		}
 		this.fastMode = fastMode;
-		this.inputs = configuration.getInputArray();
+		this.inputs = inputNumbers;
 		
 		
 		if (port != null) {
@@ -206,6 +208,9 @@ public class SerialDataCommunicator {
 			out.flush();
 			out.write(rate & 0xFF);
 			out.flush();
+			
+			Thread.sleep(1000);
+			
 			
 			setBaudRate(baudrate);
 		} catch (NoSuchPortException e) {

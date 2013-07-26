@@ -20,6 +20,11 @@ import tcm.data.DataPoint;
 import tcm.document.Measurement;
 import tcm.filter.AbstractDataFilter;
 
+/*
+ * Info at:
+ *   http://www.analog.com/static/imported-files/tech_docs/dsp_book_Ch15.pdf‎
+ *   https://en.wikipedia.org/wiki/Moving_average
+ */
 @Plugin
 public class MovingMedianFilter extends AbstractDataFilter {
 	

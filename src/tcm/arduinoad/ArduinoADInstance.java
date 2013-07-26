@@ -42,6 +42,11 @@ public class ArduinoADInstance implements MeasurementInstance {
 	}
 	
 	@Override
+	public void removeListener(MeasurementListener listener) {
+		listeners.remove(listener);
+	}
+	
+	@Override
 	public void start() throws IOException {
 		timer.start();
 		try {
@@ -129,30 +134,22 @@ public class ArduinoADInstance implements MeasurementInstance {
 				return null;
 			}
 			
-			point.setTimestamp(vo.getTimeStamp());
-			point.setTime(count * ((long) config.getDelay()));
+			point.setTimestamp(vo.getTimeStamp() / 1000);
+			point.setTime(count * ((long) config.getDelay()) / 1000000.0);
 			return point;
 		}
 	}
 	
 	@Override
 	public double getMinimunValue() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	
 	
 	@Override
 	public double getMaximumValue() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1023;
 	}
 	
-	
-	@Override
-	public void removeListener(MeasurementListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 }

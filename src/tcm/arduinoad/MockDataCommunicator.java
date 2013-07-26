@@ -24,7 +24,7 @@ public class MockDataCommunicator extends SerialDataCommunicator {
 			stopListener();
 		
 		this.delay = configuration.getDelay();
-		this.inputs = configuration.getInputArray();
+		this.inputs = new int[] { configuration.getInput() };
 		
 		thread = new MockReaderThread();
 		thread.start();
@@ -47,16 +47,16 @@ public class MockDataCommunicator extends SerialDataCommunicator {
 	}
 	
 	
-
+	
 	@Override
 	public String[] getSerialPorts() {
 		return new String[] { "/dev/ttyUSB0", "/dev/mock" };
 	}
 	
 	
-
-
-
+	
+	
+	
 	private class MockReaderThread extends Thread {
 		
 		public MockReaderThread() {
@@ -104,5 +104,5 @@ public class MockDataCommunicator extends SerialDataCommunicator {
 		}
 	}
 	
-
+	
 }

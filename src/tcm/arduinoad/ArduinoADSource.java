@@ -1,13 +1,19 @@
 package tcm.arduinoad;
 
+import net.sf.openrocket.plugin.Plugin;
 import tcm.configuration.Configuration;
 import tcm.configuration.Configurator;
 import tcm.data.MeasurementInstance;
 import tcm.data.MeasurementSource;
 
-//@Plugin
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+@Plugin
 public class ArduinoADSource implements MeasurementSource {
 	
+	@Inject
+	private Provider<ArduinoADConfigurator> configurator;
 	
 	@Override
 	public String getName() {
@@ -16,14 +22,12 @@ public class ArduinoADSource implements MeasurementSource {
 	
 	@Override
 	public Configurator getConfigurator() {
-		// TODO Auto-generated method stub
-		return null;
+		return configurator.get();
 	}
 	
 	@Override
 	public MeasurementInstance getInstance(Configuration configuration) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArduinoADInstance(configuration);
 	}
 	
 }
