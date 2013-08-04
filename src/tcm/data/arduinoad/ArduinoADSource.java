@@ -1,4 +1,4 @@
-package tcm.arduinoad;
+package tcm.data.arduinoad;
 
 import net.sf.openrocket.plugin.Plugin;
 import tcm.configuration.Configuration;

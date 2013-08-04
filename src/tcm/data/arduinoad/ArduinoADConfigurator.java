@@ -1,4 +1,4 @@
-package tcm.arduinoad;
+package tcm.data.arduinoad;
 
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;

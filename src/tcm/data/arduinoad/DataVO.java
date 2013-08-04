@@ -1,4 +1,4 @@
-package tcm.arduinoad;
+package tcm.data.arduinoad;
 
 import java.util.Arrays;
 
